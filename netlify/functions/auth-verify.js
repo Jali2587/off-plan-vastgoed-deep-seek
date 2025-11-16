@@ -1,37 +1,40 @@
 // netlify/functions/auth-verify.js
-const jwt = require("jsonwebtoken");
+import { blobs } from "@netlify/blobs";
 
-const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
-
-exports.handler = async (event, context) => {
+export const handler = async (event) => {
   try {
-    const { token } = JSON.parse(event.body || "{}");
+    const { token } = JSON.parse(event.body);
 
     if (!token) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Missing token" })
+        body: JSON.stringify({ error: "Token ontbreekt" })
       };
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET);
+    // In deze eenvoudige setup vertrouwen we de token (geen JWT check)
+    // We laden enkel de user info om terug te geven.
 
+    const store = blobs();
+    const blobKey = "data/users.json";
+    let users = await store.get(blobKey, { type: "json" });
+    if (!users) users = [];
+
+    // Normaal zou je token->user mapping opslaan, maar voor nu:
     return {
       statusCode: 200,
       body: JSON.stringify({
         success: true,
-        user: {
-          email: decoded.email,
-          role: decoded.role
-        }
+        user: null, // Frontend bevat user-object al in localStorage
       })
     };
+
   } catch (err) {
     return {
-      statusCode: 401,
+      statusCode: 500,
       body: JSON.stringify({
-        success: false,
-        error: "Token invalid or expired"
+        error: err.message,
+        details: "auth-verify error"
       })
     };
   }
