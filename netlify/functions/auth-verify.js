@@ -1,4 +1,7 @@
 // netlify/functions/auth-verify.js
+const jwt = require("jsonwebtoken");
+
+const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
 exports.handler = async (event, context) => {
   try {
@@ -7,26 +10,28 @@ exports.handler = async (event, context) => {
     if (!token) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Missing token", success: false })
+        body: JSON.stringify({ error: "Missing token" })
       };
     }
 
-    const decoded = JSON.parse(Buffer.from(token, "base64").toString("utf8"));
+    const decoded = jwt.verify(token, JWT_SECRET);
 
     return {
       statusCode: 200,
       body: JSON.stringify({
         success: true,
-        user: decoded
+        user: {
+          email: decoded.email,
+          role: decoded.role
+        }
       })
     };
-
   } catch (err) {
     return {
-      statusCode: 500,
+      statusCode: 401,
       body: JSON.stringify({
         success: false,
-        error: err.message
+        error: "Token invalid or expired"
       })
     };
   }
