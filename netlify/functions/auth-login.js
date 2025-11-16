@@ -1,45 +1,42 @@
 // netlify/functions/auth-login.js
 
-import { loadJSON, createToken } from "./lib/helpers.js";
-
-export const handler = async (event) => {
+exports.handler = async (event, context) => {
   try {
-    const { email } = JSON.parse(event.body);
+    const { email } = JSON.parse(event.body || "{}");
 
     if (!email) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Email is verplicht." })
+        body: JSON.stringify({ error: "Email is required" })
       };
     }
 
-    const users = loadJSON("users.json");
+    // ADMIN
+    const ADMIN_EMAIL = "jaap@jlmbusinessholding.com";
 
-    const user = users.find((u) => u.email === email);
+    const user = {
+      email,
+      role: email === ADMIN_EMAIL ? "admin" : "investor"
+    };
 
-    if (!user) {
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ error: "Account niet gevonden." })
-      };
-    }
+    // Fake JWT for now
+    const fakeToken = Buffer.from(
+      JSON.stringify({ email: user.email, role: user.role })
+    ).toString("base64");
 
-    // Alles goed → token genereren
     return {
       statusCode: 200,
       body: JSON.stringify({
+        success: true,
         user,
-        token: createToken(user)
+        token: fakeToken
       })
     };
 
   } catch (err) {
     return {
       statusCode: 500,
-      body: JSON.stringify({
-        error: err.message,
-        details: "auth-login error"
-      })
+      body: JSON.stringify({ error: err.message })
     };
   }
 };
