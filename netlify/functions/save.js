@@ -1,9 +1,9 @@
 // netlify/functions/save.js
+const { blobs } = require("@netlify/blobs");
 
-import { blobs } from "@netlify/blobs";
-
-export async function handler(event, context) {
+exports.handler = async (event, context) => {
   try {
+    // Method check
     if (event.httpMethod !== "POST") {
       return {
         statusCode: 405,
@@ -11,51 +11,74 @@ export async function handler(event, context) {
       };
     }
 
-    const { file, newData } = JSON.parse(event.body);
+    // Parse body safely
+    let body;
+    try {
+      body = JSON.parse(event.body);
+    } catch (e) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Invalid JSON body" })
+      };
+    }
+
+    const { file, newData } = body;
 
     if (!file) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "file parameter missing" })
+        body: JSON.stringify({ error: "Missing 'file' parameter" })
+      };
+    }
+
+    if (!newData || typeof newData !== "object") {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "newData must be a JSON object" })
       };
     }
 
     const store = blobs();
     const blobKey = `data/${file}`;
 
-    // ⬇️ 1. Lees bestaande data (of maak lege array)
+    // 1. Lees bestaande JSON veilig
     let existing = [];
-
-    const current = await store.get(blobKey, { type: "json" });
-
-    if (current) {
-      existing = current;
+    try {
+      const current = await store.get(blobKey, { type: "json" });
+      if (Array.isArray(current)) {
+        existing = current;
+      }
+    } catch (e) {
+      // ignore — start fresh
     }
 
-    // ⬇️ 2. Nieuwe reservering toevoegen
-    existing.push({
+    // 2. Veilige merge zonder undefined
+    const entry = {
       ...newData,
       savedAt: new Date().toISOString()
-    });
+    };
 
-    // ⬇️ 3. Terugschrijven naar Netlify Blob Storage
+    existing.push(entry);
+
+    // 3. Terugschrijven
     await store.setJSON(blobKey, existing);
 
     return {
       statusCode: 200,
       body: JSON.stringify({
         success: true,
-        saved: newData,
-        totalEntries: existing.length
+        saved: entry,
+        total: existing.length
       })
     };
+
   } catch (err) {
     return {
       statusCode: 500,
       body: JSON.stringify({
         error: err.message,
-        details: "Blob write error"
+        details: "Blob write error (safe handler)"
       })
     };
   }
-}
+};
