@@ -1,26 +1,31 @@
-import fs from "fs";
-import path from "path";
+// netlify/functions/save.js
+import { blobs } from "@netlify/blobs";
 
-export default async (req, res) => {
+exports.handler = async (event, context) => {
   try {
-    const { newData, file } = JSON.parse(req.body);
+    const { newData, file } = JSON.parse(event.body);
 
-    const fullPath = path.join(process.cwd(), "data", file);
+    const store = blobs();
 
-    let existing = [];
+    // Lees huidige data
+    const existingRaw = await store.get(file);
+    let existing = existingRaw ? JSON.parse(existingRaw) : [];
 
-    if (fs.existsSync(fullPath)) {
-      const fileData = fs.readFileSync(fullPath, "utf8");
-      existing = JSON.parse(fileData);
-    }
-
+    // Voeg het nieuwe object toe
     existing.push(newData);
 
-    fs.writeFileSync(fullPath, JSON.stringify(existing, null, 2));
+    // Sla op
+    await store.set(file, JSON.stringify(existing, null, 2));
 
-    res.status(200).json({ success: true, saved: newData });
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ success: true, saved: newData })
+    };
 
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message })
+    };
   }
 };
