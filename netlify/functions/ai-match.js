@@ -1,16 +1,11 @@
-import OpenAI from "openai";
+// netlify/functions/ai-match.js
 
-const client = new OpenAI({
-  apiKey: process.env.DEEPSEEK_API_KEY
-});
-
-export default async (req, res) => {
+exports.handler = async (event, context) => {
   try {
-    const body = JSON.parse(req.body);
-    const { project, investors } = body;
+    const { project, investors } = JSON.parse(event.body);
 
     const prompt = `
-You are an AI specialized in matching investors or brokers to real-estate projects.
+You are an AI specialized in matching investors to real-estate projects.
 
 PROJECT:
 ${JSON.stringify(project, null, 2)}
@@ -18,7 +13,8 @@ ${JSON.stringify(project, null, 2)}
 INVESTORS:
 ${JSON.stringify(investors, null, 2)}
 
-Return a JSON array. For each match:
+Return ONLY a JSON array, no explanations.
+Each item:
 {
   "name": "",
   "matchScore": 0-100,
@@ -27,20 +23,40 @@ Return a JSON array. For each match:
 }
 `;
 
-    const completion = await client.chat.completions.create({
-      model: "deepseek-chat",
-      messages: [{ role: "user", content: prompt }]
+    const response = await fetch("https://api.deepseek.com/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.DEEPSEEK_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "deepseek-chat",
+        messages: [{ role: "user", content: prompt }]
+      })
     });
 
-    const text = completion.choices[0].message.content;
-    const parsed = JSON.parse(text);
+    const data = await response.json();
+    const text = data.choices[0].message.content;
 
-    res.status(200).json(parsed);
+    // Safety parsing: extract only JSON
+    const jsonStart = text.indexOf("[");
+    const jsonEnd = text.lastIndexOf("]") + 1;
+    const jsonString = text.substring(jsonStart, jsonEnd);
+
+    const parsed = JSON.parse(jsonString);
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(parsed)
+    };
 
   } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      details: "DeepSeek AI match error"
-    });
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        error: err.message,
+        details: "DeepSeek AI match function error"
+      })
+    };
   }
 };
