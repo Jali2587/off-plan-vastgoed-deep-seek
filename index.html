@@ -15,8 +15,8 @@
   <!-- Babel for JSX -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <!-- Icons -->
-  <script src="https://unpkg.com/lucide-react/dist/lucide-react.min.js"></script>
+  <!-- Lucide (correct CDN version) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
 </head>
 
@@ -26,44 +26,42 @@
   <script type="text/babel">
 
 // ======================================================================
-//  CONFIG – JSON datastore endpoints (hosted in Netlify/GitHub)
+//  CONFIG – JSON datastore endpoints (no leading slash!)
 // ======================================================================
-const PROJECTS_URL = "/data/projects.json";
-const INVESTORS_URL = "/data/investors.json";
-const RESERVATIONS_URL = "/data/reservations.json";
+const PROJECTS_URL = "data/projects.json";
+const INVESTORS_URL = "data/investors.json";
+const RESERVATIONS_URL = "data/reservations.json";
+
 
 // ======================================================================
-//  SERVERLESS API HELPERS (SAFE) – Netlify Functions
+//  SERVERLESS API HELPERS – Netlify Functions
 // ======================================================================
 
-// save a reservation or new project entry
 async function saveToNetlify(newData, fileName) {
   const res = await fetch("/.netlify/functions/save", {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ file: fileName, newData })
   });
   return res.json();
 }
 
-// DeepSeek AI matching (server-side)
 async function runAIMatch(project, investors) {
   const res = await fetch("/.netlify/functions/ai-match", {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ project, investors })
   });
   return res.json();
 }
 
+
 // ======================================================================
-//  APP START
+//  REACT SHORTCUTS & HELPERS
 // ======================================================================
 
 const { useState, useEffect } = React;
-// ======================================================================
-//  HELPERS & CALC LOGIC
-// ======================================================================
 
-// Format price in EUR (nl-NL)
 function formatPrice(value) {
   return new Intl.NumberFormat("nl-NL", {
     style: "currency",
@@ -72,9 +70,6 @@ function formatPrice(value) {
   }).format(value);
 }
 
-// ----------------------------------------------------------------------
-// CALCULATE AVAILABILITY
-// ----------------------------------------------------------------------
 function calculateAvailability(property) {
   const available = property.totalUnits - property.soldUnits;
   const percentageSold = Math.round(
@@ -83,9 +78,6 @@ function calculateAvailability(property) {
   return { available, percentageSold };
 }
 
-// ----------------------------------------------------------------------
-// SALES SPEED CALC
-// ----------------------------------------------------------------------
 function calculateSalesSpeed(property) {
   const start = new Date(property.salesStartDate);
   const today = new Date();
@@ -96,61 +88,23 @@ function calculateSalesSpeed(property) {
   );
 
   const soldPerMonth = property.soldUnits / monthsElapsed;
-
   return { monthsElapsed, soldPerMonth };
 }
 
-// ----------------------------------------------------------------------
-// URGENCY BADGE LOGIC
-// ----------------------------------------------------------------------
 function getUrgencyLevel(available) {
-  if (available <= 2) {
-    return {
-      color: "from-red-600 to-rose-500",
-      text: "Laatste kans",
-      pulse: true
-    };
-  }
-  if (available <= 4) {
-    return {
-      color: "from-amber-600 to-orange-500",
-      text: "Bijna uitverkocht",
-      pulse: true
-    };
-  }
-  if (available <= 8) {
-    return {
-      color: "from-yellow-500 to-amber-400",
-      text: "Populair",
-      pulse: false
-    };
-  }
-  return {
-    color: "from-emerald-500 to-teal-400",
-    text: "Beschikbaar",
-    pulse: false
-  };
+  if (available <= 2) return { color: "from-red-600 to-rose-500", text: "Laatste kans", pulse: true };
+  if (available <= 4) return { color: "from-amber-600 to-orange-500", text: "Bijna uitverkocht", pulse: true };
+  if (available <= 8) return { color: "from-yellow-500 to-amber-400", text: "Populair", pulse: false };
+  return { color: "from-emerald-500 to-teal-400", text: "Beschikbaar", pulse: false };
 }
 
-// ----------------------------------------------------------------------
-// IMAGE CAROUSEL HELPERS
-// ----------------------------------------------------------------------
-function nextIndex(current, arrayLength) {
-  return (current + 1) % arrayLength;
-}
+function nextIndex(i, len) { return (i + 1) % len; }
+function prevIndex(i, len) { return (i - 1 + len) % len; }
+function isEmpty(v) { return !v || v.trim().length < 1; }
 
-function prevIndex(current, arrayLength) {
-  return (current - 1 + arrayLength) % arrayLength;
-}
 
-// ----------------------------------------------------------------------
-// INPUT VALIDATION
-// ----------------------------------------------------------------------
-function isEmpty(value) {
-  return !value || value.trim().length < 1;
-}
 // ======================================================================
-//  OVERVIEW PAGE – PROJECT GRID
+//  PROJECT CARD
 // ======================================================================
 
 function ProjectCard({ p, onSelect, isAdmin, onEdit, onDelete }) {
@@ -159,109 +113,57 @@ function ProjectCard({ p, onSelect, isAdmin, onEdit, onDelete }) {
 
   return (
     <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-2xl overflow-hidden shadow-xl hover:shadow-amber-500/20 transition">
-      
-      {/* RENDER IMAGE */}
       <div className="relative">
-        <img
-          src={p.images?.[0] || "https://placehold.co/1000x700?text=Geen+Afbeelding"}
-          className="w-full h-56 object-cover"
-        />
+        <img src={p.images?.[0] || "https://placehold.co/1000x700"} className="w-full h-56 object-cover" />
 
-        {/* URGENCY BADGE */}
         <div className="absolute top-4 left-4">
-          <div className={`
-            px-4 py-1 rounded-full text-sm font-bold 
-            bg-gradient-to-r ${urgency.color} text-white 
-            ${urgency.pulse ? "animate-pulse" : ""}
-          `}>
+          <div className={`px-4 py-1 rounded-full bg-gradient-to-r ${urgency.color} text-white text-sm font-bold ${urgency.pulse ? "animate-pulse" : ""}`}>
             {urgency.text}
           </div>
         </div>
 
-        {/* ADMIN EDIT BUTTONS */}
         {isAdmin && (
           <div className="absolute top-4 right-4 flex gap-2">
-            <button
-              onClick={() => onEdit(p)}
-              className="px-3 py-1 bg-amber-500 text-slate-900 rounded-full text-xs font-bold"
-            >
-              Bewerken
-            </button>
-            <button
-              onClick={() => onDelete(p)}
-              className="px-3 py-1 bg-red-600 text-white rounded-full text-xs font-bold"
-            >
-              Verwijderen
-            </button>
+            <button onClick={() => onEdit(p)} className="px-3 py-1 bg-amber-500 text-slate-900 rounded-full text-xs font-bold">Bewerken</button>
+            <button onClick={() => onDelete(p)} className="px-3 py-1 bg-red-600 text-white rounded-full text-xs font-bold">Verwijderen</button>
           </div>
         )}
       </div>
 
-      {/* CARD CONTENT */}
       <div className="p-6">
+        <h2 className="text-xl font-bold">{p.title}</h2>
+        <p className="text-slate-300 mb-3 flex items-center gap-2">📍 {p.location}</p>
+        <p className="text-3xl font-bold text-amber-400 mb-4">{formatPrice(p.price)}</p>
 
-        <h2 className="text-xl font-bold text-white">{p.title}</h2>
-
-        <p className="text-slate-300 mb-3 flex items-center gap-2">
-          <svg width="16" height="16" fill="currentColor">
-            <path d="M8 0C4.13 0 1 3.13 1 7c0 5.25 7 9 7 9s7-3.75 7-9c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S6.62 4.5 8 4.5s2.5 1.12 2.5 2.5S9.38 9.5 8 9.5z"/>
-          </svg>
-          {p.location}
-        </p>
-
-        <p className="text-3xl font-bold text-amber-400 mb-4">
-          {formatPrice(p.price)}
-        </p>
-
-        {/* QUICK STATS */}
         <div className="grid grid-cols-3 text-center mb-4">
-          
-          <div>
-            <p className="text-slate-400 text-xs">ROI</p>
-            <p className="text-amber-300 font-bold">{p.roi}%</p>
-          </div>
-
-          <div>
-            <p className="text-slate-400 text-xs">Units</p>
-            <p className="text-white font-bold">{p.totalUnits}</p>
-          </div>
-
-          <div>
-            <p className="text-slate-400 text-xs">Beschikbaar</p>
-            <p className="text-white font-bold">{available}</p>
-          </div>
-
+          <div><p className="text-slate-400 text-xs">ROI</p><p className="text-amber-300 font-bold">{p.roi}%</p></div>
+          <div><p className="text-slate-400 text-xs">Units</p><p className="text-white font-bold">{p.totalUnits}</p></div>
+          <div><p className="text-slate-400 text-xs">Beschikbaar</p><p className="text-white font-bold">{available}</p></div>
         </div>
 
-        {/* PROGRESS BAR */}
         <div className="w-full bg-slate-800 rounded-full h-2 mb-4">
-          <div
-            className="h-2 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500"
-            style={{ width: `${percentageSold}%` }}
-          />
+          <div className="h-2 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500" style={{ width: `${percentageSold}%` }} />
         </div>
 
-        {/* MORE DETAILS BUTTON */}
         <button
           onClick={() => onSelect(p)}
-          className="mt-2 w-full bg-gradient-to-r from-amber-500 to-yellow-600 text-slate-900 py-2 rounded-xl font-bold shadow-lg shadow-amber-500/20 hover:from-amber-400 hover:to-yellow-500 transition"
+          className="mt-2 w-full bg-gradient-to-r from-amber-500 to-yellow-600 text-slate-900 py-2 rounded-xl font-bold shadow-lg shadow-amber-500/20 hover:from-amber-400 transition"
         >
           Bekijk project
         </button>
-
       </div>
     </div>
   );
 }
 
+
 // ======================================================================
-//  OVERVIEW PAGE WRAPPER
+//  OVERVIEW PAGE
 // ======================================================================
 
 function OverviewPage({ projects, onSelect, isAdmin, onEdit, onDelete }) {
   return (
     <div className="p-8 max-w-7xl mx-auto">
-
       <div className="flex justify-between mb-8">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-amber-300 to-yellow-500 text-transparent bg-clip-text">
           Vastgoedprojecten – Spanje & Nederland
@@ -270,14 +172,13 @@ function OverviewPage({ projects, onSelect, isAdmin, onEdit, onDelete }) {
         {isAdmin && (
           <button
             onClick={() => onEdit("new")}
-            className="px-4 py-2 bg-amber-500 text-slate-900 rounded-xl font-bold shadow-lg shadow-amber-500/20"
+            className="px-4 py-2 bg-amber-500 text-slate-900 rounded-xl font-bold"
           >
             + Nieuw project
           </button>
         )}
       </div>
 
-      {/* GRID */}
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {projects.map((p) => (
           <ProjectCard
@@ -293,8 +194,10 @@ function OverviewPage({ projects, onSelect, isAdmin, onEdit, onDelete }) {
     </div>
   );
 }
+
+
 // ======================================================================
-//  IMAGE CAROUSEL COMPONENT (renders + floorplans)
+//  IMAGE CAROUSEL
 // ======================================================================
 
 function ImageCarousel({ images, currentIndex, setIndex }) {
@@ -307,31 +210,17 @@ function ImageCarousel({ images, currentIndex, setIndex }) {
 
   return (
     <div className="relative bg-black rounded-2xl overflow-hidden shadow-2xl mb-8">
-      <img
-        src={images[currentIndex]}
-        className="w-full h-[600px] object-contain bg-black"
-      />
+      <img src={images[currentIndex]} className="w-full h-[600px] object-contain bg-black" />
 
       {images.length > 1 && (
         <>
-          {/* PREV */}
-          <button
-            onClick={() => setIndex((i) => prevIndex(i, images.length))}
-            className="absolute left-6 top-1/2 -translate-y-1/2 bg-slate-900/80 backdrop-blur-sm p-4 rounded-full text-white hover:bg-amber-500/90 transition shadow-xl"
-          >
-            ‹
-          </button>
+          <button onClick={() => setIndex((i) => prevIndex(i, images.length))}
+            className="absolute left-6 top-1/2 -translate-y-1/2 bg-slate-900/80 p-4 rounded-full text-white">‹</button>
 
-          {/* NEXT */}
-          <button
-            onClick={() => setIndex((i) => nextIndex(i, images.length))}
-            className="absolute right-6 top-1/2 -translate-y-1/2 bg-slate-900/80 backdrop-blur-sm p-4 rounded-full text-white hover:bg-amber-500/90 transition shadow-xl"
-          >
-            ›
-          </button>
+          <button onClick={() => setIndex((i) => nextIndex(i, images.length))}
+            className="absolute right-6 top-1/2 -translate-y-1/2 bg-slate-900/80 p-4 rounded-full text-white">›</button>
 
-          {/* COUNTER */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/80 text-white px-6 py-2 rounded-full text-sm border border-amber-500/30">
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/80 px-6 py-2 rounded-full text-sm text-white">
             {currentIndex + 1} / {images.length}
           </div>
         </>
@@ -341,7 +230,7 @@ function ImageCarousel({ images, currentIndex, setIndex }) {
 }
 
 // ======================================================================
-//  PROJECT DETAIL PAGE
+//  DETAIL PAGE
 // ======================================================================
 
 function DetailPage({ property, onBack, onReserve, onAIMatch }) {
@@ -356,8 +245,6 @@ function DetailPage({ property, onBack, onReserve, onAIMatch }) {
 
   return (
     <div className="max-w-7xl mx-auto p-8">
-
-      {/* TERUG */}
       <button
         onClick={onBack}
         className="flex items-center gap-2 text-amber-300 hover:text-amber-400 transition mb-6"
@@ -365,12 +252,11 @@ function DetailPage({ property, onBack, onReserve, onAIMatch }) {
         ← Terug naar overzicht
       </button>
 
-      {/* TITLE */}
       <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-amber-200 to-yellow-500 bg-clip-text text-transparent">
         {property.title}
       </h1>
 
-      {/* SWITCH BUTTONS */}
+      {/* RENDER / FLOORPLAN SWITCH */}
       <div className="flex gap-4 mb-6">
         <button
           onClick={() => { setView("renders"); setIndex(0); }}
@@ -395,53 +281,35 @@ function DetailPage({ property, onBack, onReserve, onAIMatch }) {
         </button>
       </div>
 
-      {/* IMAGE CAROUSEL */}
-      <ImageCarousel
-        images={images}
-        currentIndex={index}
-        setIndex={setIndex}
-      />
+      <ImageCarousel images={images} currentIndex={index} setIndex={setIndex} />
 
-      {/* MAIN LAYOUT */}
       <div className="grid lg:grid-cols-3 gap-8">
-
-        {/* LEFT COLUMN -------------------------------------------------- */}
+        {/* LEFT COLUMN */}
         <div className="lg:col-span-2 space-y-6">
-
-          {/* DESCRIPTION */}
-          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 backdrop-blur-xl">
-            <h2 className="text-3xl font-bold mb-4 text-white">
-              Over dit project
-            </h2>
-            <p className="text-slate-300 text-lg leading-relaxed">
+          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8">
+            <h2 className="text-3xl font-bold mb-4">Over dit project</h2>
+            <p className="text-slate-300 leading-relaxed text-lg">
               {property.description}
             </p>
           </div>
 
-          {/* FEATURES */}
           {property.features?.length > 0 && (
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8 backdrop-blur-xl">
-              <h3 className="text-2xl font-bold mb-4 text-white">Kenmerken</h3>
+            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-8">
+              <h3 className="text-2xl font-bold mb-4">Kenmerken</h3>
               <div className="flex flex-wrap gap-3">
                 {property.features.map((f, i) => (
-                  <span
-                    key={i}
-                    className="px-4 py-2 bg-slate-800/50 border border-amber-500/20 rounded-xl text-slate-200"
-                  >
+                  <span key={i} className="px-4 py-2 bg-slate-800/50 border border-amber-500/20 rounded-xl text-slate-200">
                     {f}
                   </span>
                 ))}
               </div>
             </div>
           )}
-
         </div>
 
-        {/* RIGHT COLUMN -------------------------------------------------- */}
+        {/* RIGHT COLUMN */}
         <div className="space-y-8">
-
-          {/* PRICE BOX */}
-          <div className="bg-slate-900/60 border border-amber-500/20 rounded-2xl p-8 backdrop-blur-xl shadow-xl">
+          <div className="bg-slate-900/60 border border-amber-500/20 rounded-2xl p-8 shadow-xl">
             <p className="text-xl text-slate-300 mb-2 flex items-center gap-2">
               📍 {property.location}
             </p>
@@ -451,7 +319,6 @@ function DetailPage({ property, onBack, onReserve, onAIMatch }) {
             </p>
 
             <div className="grid grid-cols-2 gap-4">
-
               <div className="bg-slate-800/40 p-4 rounded-xl text-center">
                 <p className="text-xs text-slate-400 uppercase">Oppervlakte</p>
                 <p className="text-amber-300 font-bold text-xl">{property.m2} m²</p>
@@ -471,10 +338,8 @@ function DetailPage({ property, onBack, onReserve, onAIMatch }) {
                 <p className="text-xs text-slate-400 uppercase">ROI</p>
                 <p className="text-amber-300 font-bold text-xl">{property.roi}%</p>
               </div>
-
             </div>
 
-            {/* AVAILABILITY */}
             <div className="mt-6">
               <p className="text-slate-400 text-sm mb-2">
                 Verkocht: {property.soldUnits}/{property.totalUnits}
@@ -485,50 +350,47 @@ function DetailPage({ property, onBack, onReserve, onAIMatch }) {
                   className="h-2 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500"
                   style={{ width: `${percentageSold}%` }}
                 ></div>
+                </div>
+
+                <p className="text-slate-300 text-sm mb-4">
+                  Verkooptempo:{" "}
+                  <span className="text-amber-300">{soldPerMonth.toFixed(1)}</span>{" "}
+                  per maand (sinds {monthsElapsed} maanden)
+                </p>
+
+                <div
+                  className={`px-4 py-2 rounded-xl font-bold text-center bg-gradient-to-r ${urgency.color} text-white ${
+                    urgency.pulse ? "animate-pulse" : ""
+                  }`}
+                >
+                  {urgency.text} — {available} beschikbaar
+                </div>
               </div>
 
-              <p className="text-slate-300 text-sm mb-4">
-                Verkooptempo: <span className="text-amber-300">{soldPerMonth.toFixed(1)}</span> per maand (sinds {monthsElapsed} maanden)
-              </p>
+              {/* CTA BUTTONS */}
+              <div className="mt-8 space-y-4">
+                <button
+                  onClick={onAIMatch}
+                  className="w-full px-4 py-3 bg-gradient-to-r from-amber-500 to-yellow-600 text-slate-900 font-bold rounded-xl shadow-lg hover:from-amber-400 transition"
+                >
+                  🤖 AI Matching
+                </button>
 
-              {/* URGENCY */}
-              <div
-                className={`
-                  px-4 py-2 rounded-xl font-bold text-center 
-                  bg-gradient-to-r ${urgency.color} text-white
-                  ${urgency.pulse ? "animate-pulse" : ""}
-                `}
-              >
-                {urgency.text} — {available} beschikbaar
+                <button
+                  onClick={onReserve}
+                  className="w-full px-4 py-3 bg-green-500 text-slate-900 font-bold rounded-xl shadow-lg hover:bg-green-400 transition"
+                >
+                  Reserveren
+                </button>
               </div>
             </div>
-
-            {/* CTA BUTTONS */}
-            <div className="mt-8 space-y-4">
-
-              <button
-                onClick={onAIMatch}
-                className="w-full px-4 py-3 bg-gradient-to-r from-amber-500 to-yellow-600 text-slate-900 font-bold rounded-xl shadow-lg shadow-amber-500/20 hover:from-amber-400 hover:to-yellow-500 transition"
-              >
-                🤖 AI Matching
-              </button>
-
-              <button
-                onClick={onReserve}
-                className="w-full px-4 py-3 bg-green-500 text-slate-900 font-bold rounded-xl shadow-lg hover:bg-green-400 transition"
-              >
-                Reserveren
-              </button>
-
-            </div>
-
           </div>
-
         </div>
-      </div>
     </div>
   );
 }
+
+
 // ======================================================================
 //  RESERVATION PAGE
 // ======================================================================
@@ -544,12 +406,11 @@ function ReservationPage({ property, onBack, onSuccess }) {
   const [error, setError] = useState("");
 
   async function handleSubmit() {
-    if (isEmpty(form.name) || isEmpty(form.email) || isEmpty(form.phone)) {
+    if (!form.name || !form.email || !form.phone) {
       setError("Vul alle verplichte velden in.");
       return;
     }
 
-    // build reservation entry
     const reservation = {
       id: Date.now(),
       projectId: property.id,
@@ -561,17 +422,14 @@ function ReservationPage({ property, onBack, onSuccess }) {
     };
 
     await saveToNetlify(reservation, "reservations.json");
-
     onSuccess();
   }
 
   return (
     <div className="max-w-2xl mx-auto p-8">
-
-      {/* TERUG */}
       <button
         onClick={onBack}
-        className="flex items-center gap-2 text-amber-300 hover:text-amber-400 transition mb-6"
+        className="text-amber-300 mb-6 flex items-center gap-2 hover:text-amber-400"
       >
         ← Terug naar project
       </button>
@@ -580,105 +438,77 @@ function ReservationPage({ property, onBack, onSuccess }) {
         Reserveren – {property.title}
       </h1>
 
-      {/* PROPERTY SUMMARY */}
-      <div className="bg-slate-900/60 border border-amber-500/20 p-6 rounded-xl mb-6">
-        <p className="text-white font-bold text-lg">{property.title}</p>
-        <p className="text-slate-300 flex items-center gap-2 mb-1">
-          📍 {property.location}
-        </p>
-        <p className="text-amber-300 text-xl font-bold">
-          {formatPrice(property.price)}
-        </p>
-      </div>
-
       {error && (
         <div className="bg-red-600/40 border border-red-500/50 text-red-100 px-4 py-2 rounded-lg mb-4">
           {error}
         </div>
       )}
 
-      {/* FORM */}
-      <div className="space-y-5">
+      <div className="bg-slate-900/60 border border-amber-500/20 rounded-xl p-6 mb-6">
+        <p className="text-white font-bold text-lg">{property.title}</p>
+        <p className="text-slate-300 mb-1">📍 {property.location}</p>
+        <p className="text-amber-300 text-xl font-bold">{formatPrice(property.price)}</p>
+      </div>
 
-        {/* NAME */}
+      <div className="space-y-5">
         <div>
-          <label className="block text-sm font-semibold text-amber-200/80 mb-1">
-            Volledige naam *
-          </label>
+          <label className="text-sm font-semibold text-amber-200/80 mb-1">Volledige naam *</label>
           <input
-            className="w-full px-4 py-3 bg-slate-800/50 border border-amber-500/20 rounded-xl text-white focus:ring-2 focus:ring-amber-500/50"
+            className="w-full px-4 py-3 bg-slate-800/50 border border-amber-500/20 rounded-xl text-white"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            placeholder="Uw naam"
           />
         </div>
 
-        {/* EMAIL */}
         <div>
-          <label className="block text-sm font-semibold text-amber-200/80 mb-1">
-            E-mailadres *
-          </label>
+          <label className="text-sm font-semibold text-amber-200/80 mb-1">E-mailadres *</label>
           <input
             type="email"
-            className="w-full px-4 py-3 bg-slate-800/50 border border-amber-500/20 rounded-xl text-white focus:ring-2 focus:ring-amber-500/50"
+            className="w-full px-4 py-3 bg-slate-800/50 border border-amber-500/20 rounded-xl text-white"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
-            placeholder="uw.email@voorbeeld.nl"
           />
         </div>
 
-        {/* PHONE */}
         <div>
-          <label className="block text-sm font-semibold text-amber-200/80 mb-1">
-            Telefoonnummer *
-          </label>
+          <label className="text-sm font-semibold text-amber-200/80 mb-1">Telefoonnummer *</label>
           <input
-            className="w-full px-4 py-3 bg-slate-800/50 border border-amber-500/20 rounded-xl text-white focus:ring-2 focus:ring-amber-500/50"
+            className="w-full px-4 py-3 bg-slate-800/50 border border-amber-500/20 rounded-xl text-white"
             value={form.phone}
             onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            placeholder="+31 6 12345678"
           />
         </div>
 
-        {/* MESSAGE */}
         <div>
-          <label className="block text-sm font-semibold text-amber-200/80 mb-1">
-            Bericht (optioneel)
-          </label>
+          <label className="text-sm font-semibold text-amber-200/80 mb-1">Bericht</label>
           <textarea
-            className="w-full px-4 py-3 bg-slate-800/50 border border-amber-500/20 rounded-xl text-white focus:ring-2 focus:ring-amber-500/50"
             rows={4}
-            placeholder="Eventuele vragen of opmerkingen..."
+            className="w-full px-4 py-3 bg-slate-800/50 border border-amber-500/20 rounded-xl text-white"
             value={form.message}
             onChange={(e) => setForm({ ...form, message: e.target.value })}
           />
         </div>
 
-        {/* ACTIONS */}
         <div className="flex gap-3 pt-2">
-
-          {/* CANCEL */}
           <button
             onClick={onBack}
-            className="flex-1 px-6 py-4 bg-slate-800/50 border border-slate-700 text-white rounded-xl hover:bg-slate-800 transition"
+            className="flex-1 px-6 py-4 bg-slate-800/50 border border-slate-700 rounded-xl text-white"
           >
             Annuleer
           </button>
 
-          {/* SUBMIT */}
           <button
             onClick={handleSubmit}
-            className="flex-1 px-6 py-4 bg-gradient-to-r from-amber-500 to-yellow-600 text-slate-900 rounded-xl font-bold shadow-lg hover:from-amber-400 hover:to-yellow-500 transition"
+            className="flex-1 px-6 py-4 bg-gradient-to-r from-amber-500 to-yellow-600 rounded-xl text-slate-900 font-bold"
           >
             Verstuur reservering
           </button>
-
         </div>
       </div>
-
     </div>
   );
 }
+
 
 // ======================================================================
 //  RESERVATION SUCCESS PAGE
@@ -687,28 +517,24 @@ function ReservationPage({ property, onBack, onSuccess }) {
 function ReservationSuccess({ onClose }) {
   return (
     <div className="max-w-xl mx-auto p-8 text-center">
-
-      <h1 className="text-3xl font-bold mb-4 text-amber-300">
-        🎉 Reservering verzonden!
-      </h1>
-
+      <h1 className="text-3xl font-bold text-amber-300 mb-4">🎉 Reservering verzonden!</h1>
       <p className="text-slate-300 mb-6">
-        Bedankt voor uw interesse.  
-        Wij nemen binnen 24 uur contact met u op.
+        Bedankt voor uw interesse. Wij nemen binnen 24 uur contact met u op.
       </p>
 
       <button
         onClick={onClose}
-        className="px-6 py-3 bg-amber-500 text-slate-900 rounded-xl font-bold shadow-lg hover:bg-amber-400 transition"
+        className="px-6 py-3 bg-amber-500 text-slate-900 rounded-xl font-bold"
       >
         Terug naar overzicht
       </button>
-
     </div>
   );
 }
+
+
 // ======================================================================
-//  ADMIN EDITOR – PROJECT BEWERKEN / TOEVOEGEN
+//  ADMIN EDITOR – ADD / EDIT PROJECTS
 // ======================================================================
 
 function AdminEditPage({ project, onSave, onCancel }) {
@@ -716,7 +542,7 @@ function AdminEditPage({ project, onSave, onCancel }) {
     project === "new"
       ? {
           id: Date.now(),
-          title: "Nieuw project",
+          title: "",
           location: "",
           price: 0,
           m2: 0,
@@ -736,10 +562,8 @@ function AdminEditPage({ project, onSave, onCancel }) {
 
   const [error, setError] = useState("");
 
-  // Helpers -------------------------------------------------------------
-
-  function updateField(field, value) {
-    setForm({ ...form, [field]: value });
+  function updateField(key, value) {
+    setForm({ ...form, [key]: value });
   }
 
   function updateList(field, index, value) {
@@ -748,112 +572,86 @@ function AdminEditPage({ project, onSave, onCancel }) {
     setForm({ ...form, [field]: arr });
   }
 
-  function addToList(field) {
-    setForm({ ...form, [field]: [...form[field], ""] });
-  }
-
-  function removeFromList(field, index) {
-    const arr = [...form[field]];
-    arr.splice(index, 1);
-    setForm({ ...form, [field]: arr });
-  }
-
   async function handleSave() {
-    if (isEmpty(form.title) || isEmpty(form.location)) {
+    if (!form.title || !form.location) {
       setError("Titel en locatie zijn verplicht.");
       return;
     }
-
     await onSave(form);
   }
 
-  // UI ------------------------------------------------------------------
-
   return (
     <div className="max-w-4xl mx-auto p-8">
-
-      {/* TITEL */}
-      <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-amber-200 to-yellow-500 bg-clip-text text-transparent">
+      <h1 className="text-3xl font-bold mb-6 text-amber-300">
         {project === "new" ? "Nieuw project toevoegen" : "Project bewerken"}
       </h1>
 
       {error && (
-        <div className="bg-red-600/40 border border-red-500/50 text-red-100 px-4 py-2 rounded-lg mb-4">
+        <div className="bg-red-600/40 border border-red-500/50 px-4 py-2 rounded-lg text-red-100 mb-4">
           {error}
         </div>
       )}
 
       <div className="bg-slate-900/60 border border-slate-800 p-8 rounded-2xl space-y-6">
 
-        {/* TEXT INPUTS */}
+        {/* BASIC FIELDS */}
         {[
           ["title", "Projectnaam"],
           ["location", "Locatie"],
           ["price", "Prijs (€)", "number"],
           ["m2", "Oppervlakte (m²)", "number"],
           ["bedrooms", "Slaapkamers", "number"],
-          ["deliveryDate", "Opleverdatum (bijv. Q2 2026)"],
+          ["deliveryDate", "Opleverdatum"],
           ["roi", "ROI (%)", "number"],
           ["totalUnits", "Totaal units", "number"],
           ["soldUnits", "Verkochte units", "number"],
-          ["salesStartDate", "Verkoop startdatum (YYYY-MM-DD)", "date"]
+          ["salesStartDate", "Start verkoop", "date"]
         ].map(([field, label, type = "text"]) => (
           <div key={field}>
-            <label className="block text-sm text-amber-200/80 mb-1 font-semibold">
-              {label}
-            </label>
+            <label className="block text-sm mb-1 text-amber-200">{label}</label>
             <input
               type={type}
               value={form[field]}
               onChange={(e) =>
-                updateField(
-                  field,
-                  type === "number" ? parseFloat(e.target.value) : e.target.value
-                )
+                updateField(field, type === "number" ? Number(e.target.value) : e.target.value)
               }
-              className="w-full px-4 py-3 bg-slate-800/50 border border-amber-500/20 rounded-xl text-white"
+              className="w-full px-4 py-3 bg-slate-800/50 border border-amber-500/20 rounded-xl"
             />
           </div>
         ))}
 
         {/* DESCRIPTION */}
         <div>
-          <label className="block text-sm text-amber-200/80 mb-1 font-semibold">
-            Beschrijving
-          </label>
+          <label className="block text-sm text-amber-200 mb-1">Beschrijving</label>
           <textarea
+            rows={4}
             value={form.description}
             onChange={(e) => updateField("description", e.target.value)}
-            rows={4}
-            className="w-full px-4 py-3 bg-slate-800/50 border border-amber-500/20 rounded-xl text-white"
-          ></textarea>
+            className="w-full px-4 py-3 bg-slate-800/50 border border-amber-500/20 rounded-xl"
+          />
         </div>
 
         {/* FEATURES */}
         <div>
-          <label className="block text-sm text-amber-200/80 mb-1 font-semibold">
-            Features (bijv. "Zeezicht", "Zwembad")
-          </label>
-
+          <label className="block text-sm text-amber-200 mb-1">Features</label>
           {form.features.map((f, i) => (
-            <div key={i} className="flex gap-3 mb-2">
+            <div key={i} className="flex gap-2 mb-2">
               <input
                 value={f}
                 onChange={(e) => updateList("features", i, e.target.value)}
-                className="flex-1 px-4 py-3 bg-slate-800/50 border border-amber-500/20 rounded-xl text-white"
+                className="flex-1 px-4 py-3 bg-slate-800/50 border border-amber-500/20 rounded-xl"
               />
               <button
-                onClick={() => removeFromList("features", i)}
+                onClick={() => updateList("features", i, "")}
                 className="px-3 bg-red-600 text-white rounded-xl"
               >
                 ✕
               </button>
             </div>
           ))}
-
           <button
-            onClick={() => addToList("features")}
-            className="mt-2 px-4 py-2 bg-amber-500 text-slate-900 rounded-xl font-bold"
+            onClick={() => updateField("features", [...form.features, ""])}
+            className="px-4 py-2 bg-amber-500 text-slate-900 rounded-xl font-bold"
           >
             + Feature
           </button>
@@ -861,29 +659,25 @@ function AdminEditPage({ project, onSave, onCancel }) {
 
         {/* IMAGES */}
         <div>
-          <label className="block text-sm text-amber-200/80 mb-1 font-semibold">
-            Afbeeldingen (URL’s)
-          </label>
-
+          <label className="block text-sm text-amber-200 mb-1">Afbeeldingen</label>
           {form.images.map((img, i) => (
-            <div key={i} className="flex gap-3 mb-2">
+            <div key={i} className="flex gap-2 mb-2">
               <input
                 value={img}
                 onChange={(e) => updateList("images", i, e.target.value)}
-                className="flex-1 px-4 py-3 bg-slate-800/50 border border-amber-500/20 rounded-xl text-white"
+                className="flex-1 px-4 py-3 bg-slate-800/50 border border-amber-500/20 rounded-xl"
               />
               <button
-                onClick={() => removeFromList("images", i)}
+                onClick={() => updateList("images", i, "")}
                 className="px-3 bg-red-600 text-white rounded-xl"
               >
                 ✕
               </button>
             </div>
           ))}
-
           <button
-            onClick={() => addToList("images")}
-            className="mt-2 px-4 py-2 bg-amber-500 text-slate-900 rounded-xl font-bold"
+            onClick={() => updateField("images", [...form.images, ""])}
+            className="px-4 py-2 bg-amber-500 text-slate-900 rounded-xl font-bold"
           >
             + Afbeelding
           </button>
@@ -891,58 +685,53 @@ function AdminEditPage({ project, onSave, onCancel }) {
 
         {/* FLOORPLANS */}
         <div>
-          <label className="block text-sm text-amber-200/80 mb-1 font-semibold">
-            Plattegronden (URL’s)
-          </label>
-
+          <label className="block text-sm text-amber-200 mb-1">Plattegronden</label>
           {form.floorplans.map((fp, i) => (
-            <div key={i} className="flex gap-3 mb-2">
+            <div key={i} className="flex gap-2 mb-2">
               <input
                 value={fp}
                 onChange={(e) => updateList("floorplans", i, e.target.value)}
-                className="flex-1 px-4 py-3 bg-slate-800/50 border border-amber-500/20 rounded-xl text-white"
+                className="flex-1 px-4 py-3 bg-slate-800/50 border border-amber-500/20 rounded-xl"
               />
               <button
-                onClick={() => removeFromList("floorplans", i)}
+                onClick={() => updateList("floorplans", i, "")}
                 className="px-3 bg-red-600 text-white rounded-xl"
               >
                 ✕
               </button>
             </div>
           ))}
-
           <button
-            onClick={() => addToList("floorplans")}
-            className="mt-2 px-4 py-2 bg-amber-500 text-slate-900 rounded-xl font-bold"
+            onClick={() => updateField("floorplans", [...form.floorplans, ""])}
+            className="px-4 py-2 bg-amber-500 text-slate-900 rounded-xl font-bold"
           >
             + Plattegrond
           </button>
         </div>
-
       </div>
 
-      {/* SAVE / CANCEL BUTTONS */}
       <div className="flex gap-4 mt-8">
         <button
           onClick={onCancel}
-          className="flex-1 px-6 py-4 bg-slate-800/50 border border-slate-700 text-white rounded-xl hover:bg-slate-800 transition"
+          className="flex-1 px-6 py-4 bg-slate-800/50 border border-slate-700 rounded-xl text-white"
         >
           Annuleer
         </button>
 
         <button
           onClick={handleSave}
-          className="flex-1 px-6 py-4 bg-gradient-to-r from-amber-500 to-yellow-600 text-slate-900 rounded-xl font-bold shadow-lg hover:from-amber-400 hover:to-yellow-500 transition"
+          className="flex-1 px-6 py-4 bg-gradient-to-r from-amber-500 to-yellow-600 rounded-xl text-slate-900 font-bold"
         >
           Opslaan
         </button>
       </div>
-
     </div>
   );
 }
+
+
 // ======================================================================
-//  MAIN APP ROUTER + STATE MANAGER
+//  MAIN APP
 // ======================================================================
 
 function App() {
@@ -953,55 +742,42 @@ function App() {
   const [page, setPage] = useState("overview");
   const [selectedProject, setSelectedProject] = useState(null);
   const [adminMode, setAdminMode] = useState(false);
-
   const [aiResults, setAIResults] = useState(null);
 
-  // ------------------------------------------------------
-  // LOAD DATA FROM JSON DATASTORE
-  // ------------------------------------------------------
   async function loadData() {
-    const p = await fetch(PROJECTS_URL).then((r) => r.json());
-    const i = await fetch(INVESTORS_URL).then((r) => r.json());
-    const r = await fetch(RESERVATIONS_URL).then((r) => r.json());
+    try {
+      const p = await fetch(PROJECTS_URL).then((r) => r.json());
+      const i = await fetch(INVESTORS_URL).then((r) => r.json());
+      const r = await fetch(RESERVATIONS_URL).then((r) => r.json());
 
-    setProjects(p);
-    setInvestors(i);
-    setReservations(r);
+      setProjects(p);
+      setInvestors(i);
+      setReservations(r);
+    } catch (err) {
+      console.error("JSON load error", err);
+    }
   }
 
   useEffect(() => {
     loadData();
   }, []);
 
-  // ------------------------------------------------------
-  // SAVE PROJECT (Admin)
-  // ------------------------------------------------------
-  async function saveProject(updatedProject) {
-    await saveToNetlify(updatedProject, "projects.json");
+  async function saveProject(updated) {
+    await saveToNetlify(updated, "projects.json");
     await loadData();
     setPage("overview");
   }
 
-  // ------------------------------------------------------
-  // DELETE PROJECT (Admin)
-  // (we do not delete automatically for safety — manual via GitHub)
-  // ------------------------------------------------------
-  function handleDelete(p) {
-    alert("Verwijderen is uitgeschakeld voor veiligheid. Doe dit via GitHub.");
+  function handleDelete() {
+    alert("Verwijderen kan alleen via GitHub (veiligheidsreden).");
   }
 
-  // ------------------------------------------------------
-  // AI MATCHING
-  // ------------------------------------------------------
   async function handleAIMatching(property) {
-    const results = await runAIMatch(property, investors);
-    setAIResults(results);
+    const result = await runAIMatch(property, investors);
+    setAIResults(result);
     setPage("ai-match");
   }
 
-  // ------------------------------------------------------
-  // RENDER ROUTES
-  // ------------------------------------------------------
   function renderPage() {
     switch (page) {
       case "overview":
@@ -1009,19 +785,8 @@ function App() {
           <OverviewPage
             projects={projects}
             isAdmin={adminMode}
-            onSelect={(p) => {
-              setSelectedProject(p);
-              setPage("detail");
-            }}
-            onEdit={(p) => {
-              if (p === "new") {
-                setSelectedProject(null);
-                setPage("admin-edit");
-              } else {
-                setSelectedProject(p);
-                setPage("admin-edit");
-              }
-            }}
+            onSelect={(p) => { setSelectedProject(p); setPage("detail"); }}
+            onEdit={(p) => { setSelectedProject(p === "new" ? null : p); setPage("admin-edit"); }}
             onDelete={handleDelete}
           />
         );
@@ -1046,14 +811,7 @@ function App() {
         );
 
       case "reserve-success":
-        return (
-          <ReservationSuccess
-            onClose={() => {
-              setPage("overview");
-              setSelectedProject(null);
-            }}
-          />
-        );
+        return <ReservationSuccess onClose={() => { setPage("overview"); setSelectedProject(null); }} />;
 
       case "admin-edit":
         return (
@@ -1067,30 +825,18 @@ function App() {
       case "ai-match":
         return (
           <div className="max-w-5xl mx-auto p-8">
-            <button
-              onClick={() => setPage("detail")}
-              className="text-amber-300 mb-4"
-            >
-              ← Terug
-            </button>
+            <button onClick={() => setPage("detail")} className="text-amber-300 mb-4">← Terug</button>
 
-            <h1 className="text-3xl font-bold text-amber-400 mb-6">
-              AI Matching Resultaten
-            </h1>
+            <h1 className="text-3xl font-bold text-amber-400 mb-6">AI Matching Resultaten</h1>
 
             {(!aiResults || aiResults.length === 0) && (
-              <p className="text-slate-300">Geen AI-resultaten gevonden.</p>
+              <p className="text-slate-300">Geen resultaten gevonden.</p>
             )}
 
             {aiResults?.map((r, i) => (
-              <div
-                key={i}
-                className="bg-slate-900/60 border border-amber-500/20 p-6 rounded-xl mb-4"
-              >
+              <div key={i} className="bg-slate-900/60 border border-amber-500/20 p-6 rounded-xl mb-4">
                 <h2 className="text-xl font-bold">{r.name}</h2>
-                <p className="text-amber-300 font-bold">
-                  Matchscore: {r.matchScore}
-                </p>
+                <p className="text-amber-300 font-bold">Matchscore: {r.matchScore}</p>
                 <p className="text-slate-300">{r.reason}</p>
               </div>
             ))}
@@ -1098,44 +844,38 @@ function App() {
         );
 
       default:
-        return <p className="text-white">Onbekende pagina</p>;
+        return <p>Onbekende pagina</p>;
     }
   }
 
-  // ------------------------------------------------------
-  // RENDER COMPLETE APP LAYOUT
-  // ------------------------------------------------------
   return (
     <div>
-
-      {/* TOPBAR */}
       <div className="w-full bg-slate-900/80 border-b border-slate-800 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <h1 className="text-xl font-bold text-amber-400">Vastgoed Platform</h1>
 
           <button
             onClick={() => setAdminMode((v) => !v)}
-            className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl hover:bg-slate-700 transition"
+            className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl hover:bg-slate-700"
           >
             {adminMode ? "Admin modus: AAN" : "Admin modus: UIT"}
           </button>
         </div>
       </div>
 
-      {/* PAGE CONTENT */}
-      <div>{renderPage()}</div>
-
+      {renderPage()}
     </div>
   );
 }
+
+
 // ======================================================================
-//  START THE APP
+//  START APP
 // ======================================================================
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<App />);
 
-</script>
+  </script>
 </body>
 </html>
-
