@@ -1338,21 +1338,32 @@ function App() {
   // ---------------- LOGIN HANDLER ----------------------------
   // ----------------------------------------
   async function handleLogin(email) {
-    const result = await loginUser(email);
+  const result = await loginUser(email);
 
-    if (result.error) {
-      alert(result.error);
-      return;
-    }
-
-    setLoginModalOpen(false);
-    setToken(result.token);
-    setUser(result.user);
-    localStorage.setItem("jwt", result.token);
-    localStorage.setItem("user", JSON.stringify(result.user));
-
-    if (result.user.role === "admin") setIsAdmin(true);
+  if (!result || result.error) {
+    alert(result?.error || "Login mislukt. Server returned invalid response.");
+    return;
   }
+
+  if (!result.user) {
+    alert("Login mislukt. Geen gebruikersdata ontvangen.");
+    return;
+  }
+
+  alert("Ingelogd!");
+  setLoginModalOpen(false);
+
+  setToken(result.token || null);
+  setUser(result.user);
+
+  if (result.user && result.user.role === "admin") {
+    setIsAdmin(true);
+  }
+
+  localStorage.setItem("jwt", result.token || "");
+  localStorage.setItem("user", JSON.stringify(result.user));
+}
+
 
   // ----------------------------------------
   // ---------------- LOGOUT HANDLER ---------------------------
