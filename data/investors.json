@@ -1,19 +1,24 @@
 [
   {
     "id": 1,
+    "type": "family_office",
     "name": "Costa Capital Family Office",
-    "strategy": "residential + Spain",
+    "strategy": "residential + value-add Spain",
     "ticket": "€500k–€5M",
     "roiPreference": "6–10%",
-    "regions": ["Costa Blanca", "Murcia", "Valencia"]
+    "riskLevel": "medium",
+    "regions": ["Costa Blanca", "Murcia", "Valencia"],
+    "notes": "Focus op long-term rental & nieuwbouw projecten."
   },
   {
     "id": 2,
+    "type": "fund",
     "name": "Northern Europe PropFund",
-    "strategy": "multi-family + holiday rental",
+    "strategy": "multi-family + tourist rental",
     "ticket": "€1M–€20M",
     "roiPreference": "7–12%",
-    "regions": ["Alicante", "Marbella", "Barcelona"]
+    "riskLevel": "medium-high",
+    "regions": ["Alicante", "Marbella", "Barcelona"],
+    "notes": "Zoekt projecten met vergunningen in gevorderd stadium."
   }
 ]
-
