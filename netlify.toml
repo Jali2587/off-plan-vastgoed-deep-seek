@@ -2,7 +2,8 @@
   publish = "."
   functions = "netlify/functions"
 
+# SPA fallback (belangrijk)
 [[redirects]]
-  from = "/.netlify/functions/*"
-  to = "/.netlify/functions/:splat"
+  from = "/*"
+  to = "/index.html"
   status = 200
