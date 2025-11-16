@@ -1,50 +1,55 @@
 // netlify/functions/auth-login.js
-const jwt = require("jsonwebtoken");
+import { blobs } from "@netlify/blobs";
+import crypto from "crypto";
 
-const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
-const ADMIN_EMAIL = "jaap@jlmbusinessholding.com";
-
-exports.handler = async (event, context) => {
+export const handler = async (event) => {
   try {
-    if (event.httpMethod !== "POST") {
-      return {
-        statusCode: 405,
-        body: JSON.stringify({ error: "Only POST allowed" })
-      };
-    }
-
-    const { email } = JSON.parse(event.body || "{}");
-
+    const { email } = JSON.parse(event.body);
     if (!email) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Missing email" })
+        body: JSON.stringify({ error: "Email verplicht" })
       };
     }
 
-    // GENEREER MAGIC LINK TOKEN
-    const token = jwt.sign(
-      {
-        email,
-        role: email === ADMIN_EMAIL ? "admin" : "investor"
-      },
-      JWT_SECRET,
-      { expiresIn: "15m" }
-    );
+    const store = blobs();
+    const blobKey = "data/users.json";
 
-    const magicLink = `https://${event.headers.host}/?token=${token}`;
+    let users = await store.get(blobKey, { type: "json" });
+    if (!users) users = [];
+
+    let user = users.find((u) => u.email === email);
+
+    // Nieuw account indien niet bestaat
+    if (!user) {
+      user = {
+        id: Date.now(),
+        email,
+        role: email === "jaap@jlmbusinessholding.com" ? "admin" : "investor",
+        createdAt: new Date().toISOString()
+      };
+      users.push(user);
+      await store.setJSON(blobKey, users);
+    }
+
+    const token = crypto.randomBytes(32).toString("hex");
 
     return {
       statusCode: 200,
       body: JSON.stringify({
         success: true,
-        magicLink
+        user,
+        token
       })
     };
+
   } catch (err) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message })
+      body: JSON.stringify({
+        error: err.message,
+        details: "auth-login error"
+      })
     };
   }
 };
