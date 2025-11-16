@@ -1,51 +1,57 @@
-import fs from "fs";
-import path from "path";
+// netlify/functions/auth-register.js
+
+import { loadJSON, saveJSON, createToken } from "./lib/helpers.js";
 
 export const handler = async (event) => {
   try {
-    const { email, role } = JSON.parse(event.body || "{}");
+    const { email, role } = JSON.parse(event.body);
 
-    if (!email || !role) {
+    if (!email) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Email and role required" })
+        body: JSON.stringify({ error: "Email is verplicht." })
       };
     }
 
-    const filePath = path.join(process.cwd(), "data", "users.json");
-    let users = [];
+    const users = loadJSON("users.json");
 
-    if (fs.existsSync(filePath)) {
-      users = JSON.parse(fs.readFileSync(filePath, "utf8"));
-    }
-
-    const exists = users.find((u) => u.email === email);
-    if (exists) {
+    // Bestaat al?
+    const existing = users.find((u) => u.email === email);
+    if (existing) {
       return {
         statusCode: 200,
-        body: JSON.stringify({ success: true, user: exists })
+        body: JSON.stringify({
+          user: existing,
+          token: createToken(existing)
+        })
       };
     }
 
+    // Nieuw account
     const newUser = {
+      id: Date.now(),
       email,
-      role,
+      role: role || "investor", // default investor
       createdAt: new Date().toISOString()
     };
 
     users.push(newUser);
-
-    fs.writeFileSync(filePath, JSON.stringify(users, null, 2));
+    saveJSON("users.json", users);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ success: true, user: newUser })
+      body: JSON.stringify({
+        user: newUser,
+        token: createToken(newUser)
+      })
     };
-
   } catch (err) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message })
+      body: JSON.stringify({
+        error: err.message,
+        details: "auth-register error"
+      })
     };
   }
 };
