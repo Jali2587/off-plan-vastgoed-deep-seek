@@ -1,40 +1,59 @@
+// netlify/functions/auth-verify.js
+
 import jwt from "jsonwebtoken";
-import fs from "fs";
-import path from "path";
+import { loadJSON } from "./lib/helpers.js";
 
 export const handler = async (event) => {
   try {
-    const { token } = JSON.parse(event.body || "{}");
+    const auth = event.headers.authorization;
 
-    if (!token) {
+    if (!auth || !auth.startsWith("Bearer ")) {
       return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Token required" })
+        statusCode: 401,
+        body: JSON.stringify({ error: "Geen geldige autorisatie header." })
       };
     }
 
+    const token = auth.replace("Bearer ", "").trim();
+
+    // JWT verifiëren
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const filePath = path.join(process.cwd(), "data", "users.json");
-    const users = JSON.parse(fs.readFileSync(filePath, "utf8"));
+    if (!decoded?.email) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ error: "JWT onvolledig of ongeldig." })
+      };
+    }
+
+    // User ophalen uit JSON datastore
+    const users = loadJSON("users.json");
     const user = users.find((u) => u.email === decoded.email);
 
     if (!user) {
       return {
         statusCode: 404,
-        body: JSON.stringify({ error: "User not found" })
+        body: JSON.stringify({ error: "Gebruiker niet gevonden." })
       };
     }
 
+    // Alles ok → stuur gebruiker terug
     return {
       statusCode: 200,
-      body: JSON.stringify({ success: true, user })
+      body: JSON.stringify({
+        valid: true,
+        user
+      })
     };
 
   } catch (err) {
     return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message })
+      statusCode: 401,
+      body: JSON.stringify({
+        valid: false,
+        error: "JWT verificatie mislukt.",
+        details: err.message
+      })
     };
   }
 };
