@@ -1,66 +1,59 @@
 // netlify/functions/auth-profile.js
+const { blobs } = require("@netlify/blobs");
+const jwt = require("jsonwebtoken");
 
-import jwt from "jsonwebtoken";
-import { loadJSON } from "./lib/helpers.js";
+const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
-export const handler = async (event) => {
+exports.handler = async (event, context) => {
   try {
-    const authHeader = event.headers.authorization;
+    const store = blobs();
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (event.httpMethod === "POST") {
+      const { token, profile } = JSON.parse(event.body || "{}");
+
+      if (!token || !profile) {
+        return {
+          statusCode: 400,
+          body: JSON.stringify({ error: "Missing token or profile" })
+        };
+      }
+
+      const user = jwt.verify(token, JWT_SECRET);
+
+      await store.setJSON(`profiles/${user.email}`, profile);
+
       return {
-        statusCode: 401,
-        body: JSON.stringify({ error: "Geen geldige autorisatie header." })
+        statusCode: 200,
+        body: JSON.stringify({ success: true })
       };
     }
 
-    const token = authHeader.replace("Bearer ", "").trim();
+    if (event.httpMethod === "GET") {
+      const token = event.queryStringParameters?.token;
+      if (!token) {
+        return {
+          statusCode: 400,
+          body: JSON.stringify({ error: "Missing token" })
+        };
+      }
 
-    // Token decoderen
-    let decoded;
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
-    } catch (err) {
+      const user = jwt.verify(token, JWT_SECRET);
+
+      const profile = await store.get(`profiles/${user.email}`, {
+        type: "json"
+      });
+
       return {
-        statusCode: 401,
-        body: JSON.stringify({ error: "JWT verificatie mislukt." })
+        statusCode: 200,
+        body: JSON.stringify(profile || {})
       };
     }
 
-    if (!decoded.email) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "JWT bevat geen email." })
-      };
-    }
-
-    // User ophalen uit `/data/users.json`
-    const users = loadJSON("users.json");
-    const user = users.find((u) => u.email === decoded.email);
-
-    if (!user) {
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ error: "Gebruiker niet gevonden." })
-      };
-    }
-
-    // Succes!
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        valid: true,
-        user
-      })
-    };
-
+    return { statusCode: 405 };
   } catch (err) {
     return {
       statusCode: 500,
-      body: JSON.stringify({
-        error: err.message,
-        details: "auth-profile error"
-      })
+      body: JSON.stringify({ error: err.message })
     };
   }
 };
