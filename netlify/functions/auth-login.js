@@ -1,6 +1,6 @@
 // netlify/functions/auth-login.js
 import { blobs } from "@netlify/blobs";
-import { randomBytes } from "crypto";
+const crypto = require("crypto"); // ← VEILIGSTE OPTIE OP NETLIFY
 
 export const handler = async (event) => {
   try {
@@ -11,11 +11,11 @@ export const handler = async (event) => {
       };
     }
 
-    // -------- SAFE BODY PARSE -------
+    // -------- SAFE PARSE --------
     let body = {};
     try {
       body = JSON.parse(event.body || "{}");
-    } catch (e) {
+    } catch (err) {
       return {
         statusCode: 400,
         body: JSON.stringify({ error: "Invalid JSON body" })
@@ -32,16 +32,19 @@ export const handler = async (event) => {
     }
 
     const store = blobs();
-    const blobKey = "data/users.json";
 
-    // -------- USERS LADEN -------
-    let users = await store.get(blobKey, { type: "json" });
-    if (!users || !Array.isArray(users)) users = [];
+    // -------- USERS OPHALEN (BESTAAT OF NIET) --------
+    let users = [];
+    try {
+      users = await store.get("data/users.json", { type: "json" }) || [];
+      if (!Array.isArray(users)) users = [];
+    } catch {
+      users = [];
+    }
 
-    // -------- BESTAAND ACCOUNT? -------
+    // -------- USER ZOEKEN / MAKEN --------
     let user = users.find((u) => u.email === email);
 
-    // -------- NIEUW ACCOUNT -------
     if (!user) {
       user = {
         id: Date.now(),
@@ -51,18 +54,26 @@ export const handler = async (event) => {
       };
 
       users.push(user);
-      await store.setJSON(blobKey, users);
+
+      // schrijf database terug
+      await store.setJSON("data/users.json", users);
     }
 
-    // -------- TOKEN GENEREREN -------
-    const token = randomBytes(32).toString("hex");
+    // -------- TOKEN GENEREREN (NETLIFY SAFE) --------
+    const token = crypto.randomBytes(32).toString("hex");
+
+    await store.setJSON(`tokens/${token}.json`, {
+      email: user.email,
+      createdAt: new Date().toISOString()
+    });
 
     return {
       statusCode: 200,
       body: JSON.stringify({
         success: true,
         user,
-        token
+        token,
+        magicLink: `https://costacapital.pro/?token=${token}`
       })
     };
 
@@ -72,7 +83,7 @@ export const handler = async (event) => {
       body: JSON.stringify({
         error: err.message,
         stack: err.stack,
-        details: "auth-login error"
+        details: "auth-login fatal error"
       })
     };
   }
