@@ -1,10 +1,29 @@
 // netlify/functions/auth-login.js
 import { blobs } from "@netlify/blobs";
-import crypto from "crypto";
+import { randomBytes } from "crypto";
 
 export const handler = async (event) => {
   try {
-    const { email } = JSON.parse(event.body);
+    if (event.httpMethod !== "POST") {
+      return {
+        statusCode: 405,
+        body: JSON.stringify({ error: "POST required" })
+      };
+    }
+
+    // -------- SAFE BODY PARSE -------
+    let body = {};
+    try {
+      body = JSON.parse(event.body || "{}");
+    } catch (e) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Invalid JSON body" })
+      };
+    }
+
+    const email = (body.email || "").trim().toLowerCase();
+
     if (!email) {
       return {
         statusCode: 400,
@@ -15,12 +34,14 @@ export const handler = async (event) => {
     const store = blobs();
     const blobKey = "data/users.json";
 
+    // -------- USERS LADEN -------
     let users = await store.get(blobKey, { type: "json" });
-    if (!users) users = [];
+    if (!users || !Array.isArray(users)) users = [];
 
+    // -------- BESTAAND ACCOUNT? -------
     let user = users.find((u) => u.email === email);
 
-    // Nieuw account indien niet bestaat
+    // -------- NIEUW ACCOUNT -------
     if (!user) {
       user = {
         id: Date.now(),
@@ -28,11 +49,13 @@ export const handler = async (event) => {
         role: email === "jaap@jlmbusinessholding.com" ? "admin" : "investor",
         createdAt: new Date().toISOString()
       };
+
       users.push(user);
       await store.setJSON(blobKey, users);
     }
 
-    const token = crypto.randomBytes(32).toString("hex");
+    // -------- TOKEN GENEREREN -------
+    const token = randomBytes(32).toString("hex");
 
     return {
       statusCode: 200,
@@ -48,6 +71,7 @@ export const handler = async (event) => {
       statusCode: 500,
       body: JSON.stringify({
         error: err.message,
+        stack: err.stack,
         details: "auth-login error"
       })
     };
