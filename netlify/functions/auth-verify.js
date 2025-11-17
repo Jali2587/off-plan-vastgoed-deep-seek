@@ -3,8 +3,25 @@ import { blobs } from "@netlify/blobs";
 
 export const handler = async (event) => {
   try {
-    const { token } = JSON.parse(event.body);
+    if (event.httpMethod !== "POST") {
+      return {
+        statusCode: 405,
+        body: JSON.stringify({ error: "POST required" })
+      };
+    }
 
+    // ------------ SAFE PARSE ------------
+    let body = {};
+    try {
+      body = JSON.parse(event.body || "{}");
+    } catch (err) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Invalid JSON body" })
+      };
+    }
+
+    const token = body.token;
     if (!token) {
       return {
         statusCode: 400,
@@ -12,20 +29,15 @@ export const handler = async (event) => {
       };
     }
 
-    // In deze eenvoudige setup vertrouwen we de token (geen JWT check)
-    // We laden enkel de user info om terug te geven.
+    // 👉 In deze eenvoudige setup validatie = check dat token bestaat
+    // We koppelen tokens NIET aan users (is niet nodig)
+    // Frontend bewaart user info zelf in localStorage.
 
-    const store = blobs();
-    const blobKey = "data/users.json";
-    let users = await store.get(blobKey, { type: "json" });
-    if (!users) users = [];
-
-    // Normaal zou je token->user mapping opslaan, maar voor nu:
+    // We returnen alleen "success"
     return {
       statusCode: 200,
       body: JSON.stringify({
-        success: true,
-        user: null, // Frontend bevat user-object al in localStorage
+        success: true
       })
     };
 
@@ -34,6 +46,7 @@ export const handler = async (event) => {
       statusCode: 500,
       body: JSON.stringify({
         error: err.message,
+        stack: err.stack,
         details: "auth-verify error"
       })
     };
