@@ -2,10 +2,11 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
-  <title>Costa Capital – Vastgoed Platform</title>
+  <title>Costa Capital – Premium Spaanse Off-Plan Projecten</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Ontdek premium off-plan vastgoedprojecten in Spanje. Professioneel advies, aantrekkelijke rendementen en exclusieve ontwikkelingen aan de Costa's." />
 
-  <!-- TailwindCSS (CDN - prima voor MVP) -->
+  <!-- TailwindCSS (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- React 18 UMD -->
@@ -18,19 +19,185 @@
   <!-- Lucide Icons (UMD) -->
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
+  <!-- Google Fonts - Professional Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
+    /* Spanish/Mediterranean Color Palette */
+    :root {
+      --terracotta: #D2691E;
+      --terracotta-light: #E8956B;
+      --mediterranean-blue: #0077BE;
+      --mediterranean-blue-dark: #005A8D;
+      --sand: #F5E6D3;
+      --sand-dark: #E8D4BA;
+      --olive: #6B8E23;
+      --olive-light: #8FB339;
+      --warm-white: #FFF8F0;
+      --cream: #FFF5E6;
+    }
+
     body {
-      background: #0f172a; /* Diepe slate kleur (professioneel) */
+      background: linear-gradient(135deg, var(--warm-white) 0%, var(--cream) 100%);
+      font-family: 'Inter', sans-serif;
+      color: #2C1810;
+    }
+
+    h1, h2, h3, .heading-font {
+      font-family: 'Playfair Display', serif;
     }
 
     .modal-backdrop {
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(6px);
+      background: rgba(45, 35, 25, 0.85);
+      backdrop-filter: blur(10px);
+    }
+
+    /* Smooth Transitions */
+    * {
+      transition: all 0.2s ease-in-out;
+    }
+
+    /* Hero Gradient Background */
+    .hero-gradient {
+      background: linear-gradient(165deg, 
+        var(--mediterranean-blue) 0%, 
+        var(--mediterranean-blue-dark) 50%,
+        var(--terracotta) 100%);
+    }
+
+    /* Mediterranean Pattern Overlay */
+    .mediterranean-pattern {
+      background-image: 
+        radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(210, 105, 30, 0.05) 0%, transparent 50%);
+    }
+
+    /* Card Hover Effects */
+    .project-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .project-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(210, 105, 30, 0.15);
+    }
+
+    /* Spanish Tile Pattern */
+    .tile-pattern {
+      background-image: 
+        repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(210, 105, 30, 0.03) 10px, rgba(210, 105, 30, 0.03) 20px);
+    }
+
+    /* Smooth Scroll */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--sand);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--terracotta);
+      border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--mediterranean-blue);
+    }
+
+    /* Animation Classes */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-fadeInUp {
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    /* Pulse Animation for Urgent Badges */
+    @keyframes pulse-glow {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(210, 105, 30, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 0 10px rgba(210, 105, 30, 0);
+      }
+    }
+
+    .pulse-glow {
+      animation: pulse-glow 2s infinite;
+    }
+
+    /* Loading State */
+    .spinner {
+      border: 3px solid var(--sand);
+      border-top: 3px solid var(--terracotta);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
+
+  <script>
+    // Tailwind Custom Configuration
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            terracotta: {
+              DEFAULT: '#D2691E',
+              light: '#E8956B',
+              dark: '#B8551A',
+            },
+            mediterranean: {
+              DEFAULT: '#0077BE',
+              dark: '#005A8D',
+              light: '#3399CC',
+            },
+            sand: {
+              DEFAULT: '#F5E6D3',
+              dark: '#E8D4BA',
+              light: '#FFF8F0',
+            },
+            olive: {
+              DEFAULT: '#6B8E23',
+              light: '#8FB339',
+              dark: '#556B1F',
+            },
+            cream: '#FFF5E6',
+          },
+          fontFamily: {
+            'display': ['Playfair Display', 'serif'],
+            'body': ['Inter', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
 </head>
 
-<body class="text-white">
+<body>
   <div id="root"></div>
 
   <!-- MAIN SCRIPT -->
@@ -61,8 +228,8 @@ function LoginModal({ open, onClose, onLogin }) {
       if (result.error) {
         setMessage(result.error);
       } else {
-        setMessage("Check je inbox om in te loggen!");
-        onLogin(email); // set user in App()
+        setMessage("✅ Check je inbox om in te loggen!");
+        onLogin(email);
       }
     } catch (e) {
       setMessage("Er ging iets mis. Probeer opnieuw.");
@@ -72,33 +239,55 @@ function LoginModal({ open, onClose, onLogin }) {
   }
 
   return (
-    <div className="fixed inset-0 modal-backdrop flex items-center justify-center z-50">
-      <div className="bg-slate-900 border border-amber-500/30 rounded-2xl p-8 w-full max-w-md">
+    <div className="fixed inset-0 modal-backdrop flex items-center justify-center z-50 p-4">
+      <div className="bg-white border-2 border-terracotta/20 rounded-2xl p-8 w-full max-w-md shadow-2xl animate-fadeInUp">
 
-        <h2 className="text-2xl font-bold text-amber-300 mb-4">Inloggen</h2>
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 bg-gradient-to-br from-terracotta to-mediterranean rounded-full mx-auto mb-4 flex items-center justify-center text-3xl">
+            🏖️
+          </div>
+          <h2 className="text-3xl font-display font-bold text-gray-800 mb-2">Welkom terug</h2>
+          <p className="text-gray-600">Log in om je favoriete projecten te bekijken</p>
+        </div>
 
-        <label className="block text-sm text-slate-300 mb-1">E-mail</label>
+        <label className="block text-sm font-semibold text-gray-700 mb-2">E-mailadres</label>
         <input
-          className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl mb-4 text-white"
+          className="w-full px-4 py-3 bg-sand-light border-2 border-sand-dark rounded-xl mb-4 text-gray-800 focus:border-terracotta focus:outline-none focus:ring-2 focus:ring-terracotta/20"
           placeholder="uw.email@example.com"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
         />
 
         <button
-          className="w-full bg-gradient-to-r from-amber-500 to-yellow-600 text-slate-900 font-bold py-3 rounded-xl"
+          className="w-full bg-gradient-to-r from-terracotta to-terracotta-light text-white font-bold py-3 rounded-xl shadow-lg hover:shadow-xl hover:from-terracotta-dark hover:to-terracotta transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={handleSubmit}
           disabled={loading}
         >
-          {loading ? "Bezig..." : "Magic Link Verzenden"}
+          {loading ? (
+            <span className="flex items-center justify-center gap-2">
+              <div className="spinner !w-5 !h-5 !border-2"></div>
+              Versturen...
+            </span>
+          ) : (
+            "✉️ Magic Link Verzenden"
+          )}
         </button>
 
-        <p className="text-slate-300 text-sm mt-4">{message}</p>
+        {message && (
+          <div className={`mt-4 p-3 rounded-xl text-sm ${
+            message.includes('✅') 
+              ? 'bg-olive-light/20 text-olive-dark border border-olive-light' 
+              : 'bg-red-100 text-red-700 border border-red-300'
+          }`}>
+            {message}
+          </div>
+        )}
 
         <button
           onClick={onClose}
-          className="mt-6 w-full border border-slate-600 text-white py-2 rounded-xl"
+          className="mt-6 w-full border-2 border-gray-300 text-gray-700 py-2 rounded-xl hover:bg-gray-50"
         >
           Sluiten
         </button>
@@ -303,22 +492,33 @@ function ProjectCard({ p, onSelect, isAdmin, onEdit }) {
   const { available, percentageSold } = calculateAvailability(p);
   const urgency = getUrgencyLevel(available);
 
+  // Spanish-themed urgency colors
+  const urgencyStyles = {
+    "Laatste kans": "bg-gradient-to-r from-red-600 to-orange-500 pulse-glow",
+    "Bijna uitverkocht": "bg-gradient-to-r from-orange-500 to-terracotta pulse-glow",
+    "Populair": "bg-gradient-to-r from-terracotta to-terracotta-light",
+    "Beschikbaar": "bg-gradient-to-r from-olive to-olive-light"
+  };
+
   return (
-    <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-2xl overflow-hidden shadow-xl hover:shadow-amber-500/20 transition">
+    <div className="project-card bg-white rounded-2xl overflow-hidden shadow-lg border border-sand-dark/30 hover:border-terracotta/50">
 
       {/* IMAGE */}
-      <div className="relative">
+      <div className="relative overflow-hidden group">
         <img
-          src={p.images?.[0] || "https://placehold.co/1000x700?text=Geen+Afbeelding"}
-          className="w-full h-56 object-cover"
+          src={p.images?.[0] || "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=800&q=80"}
+          className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
+          alt={p.title}
         />
+
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
         {/* URGENCY BADGE */}
         <div className="absolute top-4 left-4">
           <div className={`
-            px-4 py-1 rounded-full text-sm font-bold 
-            bg-gradient-to-r ${urgency.color} text-white 
-            ${urgency.pulse ? "animate-pulse" : ""}
+            px-4 py-2 rounded-full text-xs font-bold text-white shadow-lg
+            ${urgencyStyles[urgency.text] || "bg-olive"}
           `}>
             {urgency.text}
           </div>
@@ -328,56 +528,67 @@ function ProjectCard({ p, onSelect, isAdmin, onEdit }) {
         {isAdmin && (
           <div className="absolute top-4 right-4 flex gap-2">
             <button
-              onClick={() => onEdit(p)}
-              className="px-3 py-1 bg-amber-500 text-slate-900 rounded-full text-xs font-bold"
+              onClick={(e) => { e.stopPropagation(); onEdit(p); }}
+              className="px-3 py-1 bg-mediterranean text-white rounded-full text-xs font-bold shadow-lg hover:bg-mediterranean-dark"
             >
-              Bewerken
+              ✏️ Bewerken
             </button>
           </div>
         )}
+
+        {/* Location Badge */}
+        <div className="absolute bottom-4 left-4">
+          <div className="bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold text-gray-800 flex items-center gap-1">
+            📍 {p.location}
+          </div>
+        </div>
       </div>
 
       {/* CONTENT */}
       <div className="p-6">
-        <h2 className="text-xl font-bold text-white">{p.title}</h2>
+        <h3 className="text-xl font-display font-bold text-gray-900 mb-2 line-clamp-2">
+          {p.title}
+        </h3>
 
-        <p className="text-slate-300 mb-3 flex items-center gap-2">
-          📍 {p.location}
-        </p>
-
-        <p className="text-3xl font-bold text-amber-400 mb-4">
+        <p className="text-3xl font-display font-bold text-terracotta mb-4">
           {formatPrice(p.price)}
         </p>
 
         {/* STATS */}
-        <div className="grid grid-cols-3 text-center mb-4">
-          <div>
-            <p className="text-slate-400 text-xs">ROI</p>
-            <p className="text-amber-300 font-bold">{p.roi}%</p>
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="bg-sand-light rounded-xl p-3 text-center">
+            <p className="text-gray-500 text-xs font-medium mb-1">ROI</p>
+            <p className="text-mediterranean font-bold text-lg">{p.roi}%</p>
           </div>
-          <div>
-            <p className="text-slate-400 text-xs">Units</p>
-            <p className="text-white font-bold">{p.totalUnits}</p>
+          <div className="bg-sand-light rounded-xl p-3 text-center">
+            <p className="text-gray-500 text-xs font-medium mb-1">Units</p>
+            <p className="text-gray-800 font-bold text-lg">{p.totalUnits}</p>
           </div>
-          <div>
-            <p className="text-slate-400 text-xs">Beschikbaar</p>
-            <p className="text-white font-bold">{available}</p>
+          <div className="bg-sand-light rounded-xl p-3 text-center">
+            <p className="text-gray-500 text-xs font-medium mb-1">Vrij</p>
+            <p className="text-olive font-bold text-lg">{available}</p>
           </div>
         </div>
 
         {/* PROGRESS BAR */}
-        <div className="w-full bg-slate-800 rounded-full h-2 mb-4">
-          <div
-            className="h-2 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500"
-            style={{ width: `${percentageSold}%` }}
-          />
+        <div className="mb-4">
+          <div className="flex justify-between text-xs text-gray-600 mb-1">
+            <span>Verkocht</span>
+            <span className="font-semibold">{percentageSold}%</span>
+          </div>
+          <div className="w-full bg-sand rounded-full h-2 overflow-hidden">
+            <div
+              className="h-2 rounded-full bg-gradient-to-r from-terracotta to-terracotta-light transition-all duration-500"
+              style={{ width: `${percentageSold}%` }}
+            />
+          </div>
         </div>
 
         <button
           onClick={() => onSelect(p)}
-          className="mt-2 w-full bg-gradient-to-r from-amber-500 to-yellow-600 text-slate-900 py-2 rounded-xl font-bold shadow-lg hover:from-amber-400 hover:to-yellow-500 transition"
+          className="w-full bg-gradient-to-r from-terracotta to-terracotta-light text-white py-3 rounded-xl font-bold shadow-md hover:shadow-lg hover:from-terracotta-dark hover:to-terracotta transform hover:scale-105"
         >
-          Bekijk project
+          Bekijk Project →
         </button>
 
       </div>
@@ -388,38 +599,264 @@ function ProjectCard({ p, onSelect, isAdmin, onEdit }) {
 
 
 // =========================================================
+// HERO SECTION COMPONENT
+// =========================================================
+function HeroSection({ onRegister, onBrowse }) {
+  return (
+    <div className="hero-gradient mediterranean-pattern py-20 px-6 text-white">
+      <div className="max-w-6xl mx-auto text-center">
+        
+        {/* Main Headline */}
+        <div className="animate-fadeInUp mb-6">
+          <h1 className="text-5xl md:text-7xl font-display font-bold mb-4 leading-tight">
+            Uw Droomhuis<br />
+            <span className="text-sand-light">aan de Spaanse Kust</span>
+          </h1>
+          <p className="text-xl md:text-2xl text-sand-light/90 max-w-3xl mx-auto leading-relaxed">
+            Ontdek premium off-plan vastgoedprojecten in Spanje. 
+            Aantrekkelijke rendementen, professioneel beheer, zorgeloos investeren.
+          </p>
+        </div>
+
+        {/* Key Benefits */}
+        <div className="grid md:grid-cols-3 gap-6 my-12 max-w-4xl mx-auto">
+          {[
+            { icon: "🏖️", title: "Costa Locaties", desc: "Exclusieve projecten aan de mooiste kusten" },
+            { icon: "💰", title: "Hoog Rendement", desc: "Aantrekkelijke ROI en waardestijging" },
+            { icon: "🤝", title: "Persoonlijk Advies", desc: "Expert begeleiding van A tot Z" }
+          ].map((benefit, i) => (
+            <div key={i} className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition">
+              <div className="text-4xl mb-3">{benefit.icon}</div>
+              <h3 className="font-display font-bold text-lg mb-2">{benefit.title}</h3>
+              <p className="text-sm text-sand-light/80">{benefit.desc}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-10">
+          <button
+            onClick={onRegister}
+            className="px-8 py-4 bg-white text-mediterranean font-bold rounded-xl shadow-2xl hover:shadow-3xl transform hover:scale-105 text-lg"
+          >
+            🎯 Gratis Registreren
+          </button>
+          <button
+            onClick={onBrowse}
+            className="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-xl hover:bg-white hover:text-mediterranean transition text-lg"
+          >
+            🏘️ Projecten Bekijken
+          </button>
+        </div>
+
+        {/* Trust Indicators */}
+        <div className="mt-12 flex flex-wrap justify-center items-center gap-8 text-sand-light/70 text-sm">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">✓</span>
+            <span>100+ Tevreden Klanten</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">✓</span>
+            <span>Exclusieve Projecten</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">✓</span>
+            <span>Zorgeloos Proces</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// =========================================================
+// WHY INVEST SECTION
+// =========================================================
+function WhyInvestSection() {
+  const reasons = [
+    {
+      icon: "☀️",
+      title: "Perfect Klimaat",
+      desc: "300+ dagen zon per jaar, het hele jaar door genieten van de Spaanse levensstijl."
+    },
+    {
+      icon: "📈",
+      title: "Sterke Markt",
+      desc: "Spaanse vastgoedmarkt groeit gestaag, ideaal voor lange termijn investeringen."
+    },
+    {
+      icon: "🏠",
+      title: "Off-Plan Voordeel",
+      desc: "Vroege instap betekent lagere prijzen en maximale waardestijging."
+    },
+    {
+      icon: "🌍",
+      title: "Internationale Vraag",
+      desc: "Hoge vraag van internationale kopers garandeert goede verhuurmogelijkheden."
+    }
+  ];
+
+  return (
+    <div className="py-20 px-6 bg-white tile-pattern">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-display font-bold text-gray-900 mb-4">
+            Waarom Investeren in Spaans Off-Plan?
+          </h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Ontdek de voordelen van investeren in nieuwbouwprojecten aan de Spaanse Costa's
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          {reasons.map((reason, i) => (
+            <div key={i} className="bg-sand-light rounded-2xl p-8 border-2 border-sand-dark/30 hover:border-terracotta/50 hover:shadow-lg transition">
+              <div className="text-5xl mb-4">{reason.icon}</div>
+              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">{reason.title}</h3>
+              <p className="text-gray-700 leading-relaxed">{reason.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// =========================================================
+// HOW IT WORKS SECTION
+// =========================================================
+function HowItWorksSection() {
+  const steps = [
+    { number: "1", title: "Ontdek", desc: "Browse door onze exclusieve projecten en vind uw ideale investering", icon: "🔍" },
+    { number: "2", title: "Persoonlijk Advies", desc: "Onze experts begeleiden u bij het maken van de juiste keuze", icon: "💼" },
+    { number: "3", title: "Reserveer", desc: "Veilig en eenvoudig uw off-plan project reserveren", icon: "📋" },
+    { number: "4", title: "Geniet", desc: "Wij regelen alles, u geniet van uw Spaanse droomhuis", icon: "🎉" }
+  ];
+
+  return (
+    <div className="py-20 px-6 bg-gradient-to-br from-mediterranean/5 to-terracotta/5">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-display font-bold text-gray-900 mb-4">
+            Zo Werkt Het
+          </h2>
+          <p className="text-xl text-gray-600">
+            In 4 eenvoudige stappen naar uw Spaanse vastgoed
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-4 gap-8">
+          {steps.map((step, i) => (
+            <div key={i} className="text-center">
+              <div className="relative mb-6">
+                <div className="w-20 h-20 mx-auto bg-gradient-to-br from-terracotta to-mediterranean rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+                  {step.icon}
+                </div>
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-olive text-white rounded-full flex items-center justify-center font-bold text-sm">
+                  {step.number}
+                </div>
+              </div>
+              <h3 className="text-xl font-display font-bold text-gray-900 mb-3">{step.title}</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">{step.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// =========================================================
 // OVERVIEW PAGE
 // =========================================================
-function OverviewPage({ projects, onSelect, isAdmin, onEdit }) {
+function OverviewPage({ projects, onSelect, isAdmin, onEdit, onRegister }) {
+  const scrollToProjects = () => {
+    document.getElementById('projects-section')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-
-      <div className="flex justify-between mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-amber-300 to-yellow-500 text-transparent bg-clip-text">
-          Vastgoedprojecten – Spanje & Nederland
-        </h1>
-
-        {isAdmin && (
-          <button
-            onClick={() => onEdit("new")}
-            className="px-4 py-2 bg-amber-500 text-slate-900 rounded-xl font-bold shadow-lg"
-          >
-            + Nieuw project
-          </button>
-        )}
-      </div>
-
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {projects.map((p) => (
-          <ProjectCard
-            key={p.id}
-            p={p}
-            onSelect={onSelect}
-            isAdmin={isAdmin}
-            onEdit={onEdit}
+    <div>
+      {/* Hero Section */}
+      {!isAdmin && (
+        <>
+          <HeroSection 
+            onRegister={onRegister}
+            onBrowse={scrollToProjects}
           />
-        ))}
+          
+          {/* Why Invest Section */}
+          <WhyInvestSection />
+          
+          {/* How It Works Section */}
+          <HowItWorksSection />
+        </>
+      )}
+
+      {/* Projects Section */}
+      <div id="projects-section" className="py-16 px-6 bg-gradient-to-b from-white to-sand-light/30">
+        <div className="max-w-7xl mx-auto">
+
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4">
+            <div>
+              <h2 className="text-4xl md:text-5xl font-display font-bold text-gray-900 mb-2">
+                {isAdmin ? "Projectbeheer" : "Beschikbare Projecten"}
+              </h2>
+              <p className="text-gray-600 text-lg">
+                {isAdmin ? "Beheer alle vastgoedprojecten" : "Ontdek onze exclusieve off-plan ontwikkelingen"}
+              </p>
+            </div>
+
+            {isAdmin && (
+              <button
+                onClick={() => onEdit("new")}
+                className="px-6 py-3 bg-gradient-to-r from-mediterranean to-mediterranean-dark text-white rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105"
+              >
+                ➕ Nieuw Project
+              </button>
+            )}
+          </div>
+
+          {projects.length === 0 ? (
+            <div className="text-center py-20">
+              <div className="text-6xl mb-4">🏗️</div>
+              <p className="text-gray-600 text-lg">Nog geen projecten beschikbaar</p>
+            </div>
+          ) : (
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {projects.map((p) => (
+                <ProjectCard
+                  key={p.id}
+                  p={p}
+                  onSelect={onSelect}
+                  isAdmin={isAdmin}
+                  onEdit={onEdit}
+                />
+              ))}
+            </div>
+          )}
+
+        </div>
       </div>
+
+      {/* Contact CTA Section */}
+      {!isAdmin && projects.length > 0 && (
+        <div className="py-20 px-6 bg-gradient-to-r from-terracotta to-mediterranean text-white">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl font-display font-bold mb-4">
+              Vragen over Off-Plan Investeren?
+            </h2>
+            <p className="text-xl text-sand-light/90 mb-8">
+              Onze experts staan voor u klaar met persoonlijk advies
+            </p>
+            <button
+              onClick={onRegister}
+              className="px-8 py-4 bg-white text-terracotta font-bold rounded-xl shadow-2xl hover:shadow-3xl transform hover:scale-105 text-lg"
+            >
+              📞 Neem Contact Op
+            </button>
+          </div>
+        </div>
+      )}
 
     </div>
   );
@@ -433,37 +870,60 @@ function OverviewPage({ projects, onSelect, isAdmin, onEdit }) {
 function ImageCarousel({ images, index, setIndex }) {
   if (!images || images.length === 0)
     return (
-      <div className="bg-slate-800 h-64 rounded-xl flex items-center justify-center text-slate-400">
-        Geen afbeeldingen
+      <div className="bg-sand-light border-2 border-sand-dark rounded-2xl h-96 flex flex-col items-center justify-center text-gray-500">
+        <div className="text-6xl mb-4">🖼️</div>
+        <p className="font-medium">Geen afbeeldingen beschikbaar</p>
       </div>
     );
 
   return (
-    <div className="relative bg-black rounded-2xl overflow-hidden shadow-2xl mb-8">
+    <div className="relative bg-gray-900 rounded-2xl overflow-hidden shadow-2xl border-4 border-sand-dark/50">
 
       <img
         src={images[index]}
-        className="w-full h-[600px] object-contain bg-black"
+        alt={`Afbeelding ${index + 1}`}
+        className="w-full h-[600px] object-contain bg-gray-900"
       />
 
       {images.length > 1 && (
         <>
+          {/* Previous Button */}
           <button
             onClick={() => setIndex(prevIndex(index, images.length))}
-            className="absolute left-6 top-1/2 -translate-y-1/2 bg-slate-900/80 p-4 rounded-full text-white hover:bg-amber-500 transition shadow-xl"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/95 backdrop-blur-sm rounded-full text-terracotta hover:bg-terracotta hover:text-white transition shadow-2xl flex items-center justify-center font-bold text-2xl"
+            aria-label="Vorige afbeelding"
           >
             ‹
           </button>
 
+          {/* Next Button */}
           <button
             onClick={() => setIndex(nextIndex(index, images.length))}
-            className="absolute right-6 top-1/2 -translate-y-1/2 bg-slate-900/80 p-4 rounded-full text-white hover:bg-amber-500 transition shadow-xl"
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/95 backdrop-blur-sm rounded-full text-terracotta hover:bg-terracotta hover:text-white transition shadow-2xl flex items-center justify-center font-bold text-2xl"
+            aria-label="Volgende afbeelding"
           >
             ›
           </button>
 
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/80 text-white px-6 py-2 rounded-full text-sm border border-amber-500/30">
+          {/* Image Counter */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-sm text-gray-800 px-5 py-2 rounded-full text-sm font-semibold border-2 border-sand-dark shadow-lg">
             {index + 1} / {images.length}
+          </div>
+
+          {/* Dot Indicators */}
+          <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2">
+            {images.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setIndex(i)}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  i === index 
+                    ? 'bg-terracotta w-8' 
+                    : 'bg-white/50 hover:bg-white/80'
+                }`}
+                aria-label={`Ga naar afbeelding ${i + 1}`}
+              />
+            ))}
           </div>
         </>
       )}
@@ -487,130 +947,175 @@ function DetailPage({ property, onBack, onReserve, onAIMatch }) {
   const { monthsElapsed, soldPerMonth } = calculateSalesSpeed(property);
   const urgency = getUrgencyLevel(available);
 
+  // Spanish-themed urgency colors
+  const urgencyStyles = {
+    "Laatste kans": "from-red-600 to-orange-500 pulse-glow",
+    "Bijna uitverkocht": "from-orange-500 to-terracotta pulse-glow",
+    "Populair": "from-terracotta to-terracotta-light",
+    "Beschikbaar": "from-olive to-olive-light"
+  };
+
   return (
-    <div className="max-w-7xl mx-auto p-8">
+    <div className="min-h-screen bg-gradient-to-b from-sand-light to-white">
+      <div className="max-w-7xl mx-auto px-6 py-8">
 
-      <button
-        onClick={onBack}
-        className="flex items-center gap-2 text-amber-300 hover:text-amber-400 transition mb-6"
-      >
-        ← Terug naar overzicht
-      </button>
-
-      <h1 className="text-4xl font-bold mb-6 text-amber-300">{property.title}</h1>
-
-      {/* VIEW SWITCH */}
-      <div className="flex gap-4 mb-6">
+        {/* Back Button */}
         <button
-          onClick={() => { setView("renders"); setIndex(0); }}
-          className={`px-6 py-3 rounded-xl font-medium ${
-            view === "renders" ? "bg-amber-500 text-slate-900" : "bg-slate-800"
-          }`}
+          onClick={onBack}
+          className="flex items-center gap-2 text-terracotta hover:text-terracotta-dark transition mb-6 font-medium"
         >
-          Renders ({property.images.length})
+          ← Terug naar overzicht
         </button>
 
-        <button
-          onClick={() => { setView("floorplans"); setIndex(0); }}
-          className={`px-6 py-3 rounded-xl font-medium ${
-            view === "floorplans" ? "bg-amber-500 text-slate-900" : "bg-slate-800"
-          }`}
-        >
-          Plattegronden ({property.floorplans.length})
-        </button>
-      </div>
+        {/* Project Title */}
+        <h1 className="text-4xl md:text-5xl font-display font-bold text-gray-900 mb-6">
+          {property.title}
+        </h1>
 
-      <ImageCarousel images={images} index={index} setIndex={setIndex} />
+        {/* VIEW SWITCH */}
+        <div className="flex gap-3 mb-6">
+          <button
+            onClick={() => { setView("renders"); setIndex(0); }}
+            className={`px-6 py-3 rounded-xl font-semibold transition shadow-md ${
+              view === "renders" 
+                ? "bg-gradient-to-r from-terracotta to-terracotta-light text-white" 
+                : "bg-white text-gray-700 border-2 border-sand-dark hover:border-terracotta"
+            }`}
+          >
+            🏠 Renders ({property.images.length})
+          </button>
 
-      {/* INFO */}
-      <div className="grid lg:grid-cols-3 gap-8">
-        
-        {/* LEFT */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-slate-900/60 border border-slate-800 p-8 rounded-2xl">
-            <h2 className="text-3xl font-bold mb-4 text-white">Over dit project</h2>
-            <p className="text-slate-300 text-lg">{property.description}</p>
-          </div>
+          <button
+            onClick={() => { setView("floorplans"); setIndex(0); }}
+            className={`px-6 py-3 rounded-xl font-semibold transition shadow-md ${
+              view === "floorplans" 
+                ? "bg-gradient-to-r from-terracotta to-terracotta-light text-white" 
+                : "bg-white text-gray-700 border-2 border-sand-dark hover:border-terracotta"
+            }`}
+          >
+            📐 Plattegronden ({property.floorplans.length})
+          </button>
         </div>
 
-        {/* RIGHT */}
-        <div className="space-y-8">
-          <div className="bg-slate-900/60 border border-amber-500/20 rounded-2xl p-8 shadow-xl">
+        {/* Image Carousel */}
+        <ImageCarousel images={images} index={index} setIndex={setIndex} />
 
-            <p className="text-xl text-slate-300 mb-2">📍 {property.location}</p>
+        {/* INFO GRID */}
+        <div className="grid lg:grid-cols-3 gap-8 mt-8">
+          
+          {/* LEFT - Description & Features */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-white border-2 border-sand-dark/30 p-8 rounded-2xl shadow-lg">
+              <h2 className="text-3xl font-display font-bold text-gray-900 mb-4">
+                Over dit project
+              </h2>
+              <p className="text-gray-700 text-lg leading-relaxed">{property.description}</p>
 
-            <p className="text-4xl font-bold text-amber-300 mb-4">{formatPrice(property.price)}</p>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-slate-800/40 p-4 rounded-xl text-center">
-                <p className="text-xs text-slate-400">Oppervlakte</p>
-                <p className="text-amber-300 text-xl">{property.m2} m²</p>
-              </div>
-
-              <div className="bg-slate-800/40 p-4 rounded-xl text-center">
-                <p className="text-xs text-slate-400">Slaapkamers</p>
-                <p className="text-amber-300 text-xl">{property.bedrooms}</p>
-              </div>
-
-              <div className="bg-slate-800/40 p-4 rounded-xl text-center">
-                <p className="text-xs text-slate-400">Oplevering</p>
-                <p className="text-amber-300 text-xl">{property.deliveryDate}</p>
-              </div>
-
-              <div className="bg-slate-800/40 p-4 rounded-xl text-center">
-                <p className="text-xs text-slate-400">ROI</p>
-                <p className="text-amber-300 text-xl">{property.roi}%</p>
-              </div>
+              {/* Features */}
+              {property.features && property.features.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="text-xl font-display font-bold text-gray-900 mb-3">Kenmerken</h3>
+                  <div className="grid md:grid-cols-2 gap-3">
+                    {property.features.map((feature, i) => (
+                      <div key={i} className="flex items-center gap-2 text-gray-700">
+                        <span className="text-terracotta">✓</span>
+                        <span>{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-
-            {/* Verkoop info */}
-            <div className="mt-6">
-              <p className="text-slate-400 text-sm mb-2">
-                Verkocht: {property.soldUnits}/{property.totalUnits}
-              </p>
-
-              <div className="w-full bg-slate-800 rounded-full h-2 mb-3">
-                <div
-                  className="h-2 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500"
-                  style={{ width: `${percentageSold}%` }}
-                ></div>
-              </div>
-
-              <p className="text-slate-300 text-sm mb-4">
-                Verkooptempo: {soldPerMonth.toFixed(1)} / maand ({monthsElapsed} maanden)
-              </p>
-
-              <div className={`
-                px-4 py-2 rounded-xl font-bold text-center 
-                bg-gradient-to-r ${urgency.color} text-white
-                ${urgency.pulse ? "animate-pulse" : ""}
-              `}>
-                {urgency.text} — {available} beschikbaar
-              </div>
-            </div>
-
-            {/* CTA */}
-            <div className="mt-8 space-y-4">
-              <button
-                onClick={onAIMatch}
-                className="w-full py-3 bg-amber-500 text-slate-900 font-bold rounded-xl shadow-lg"
-              >
-                🤖 AI Matching
-              </button>
-
-              <button
-                onClick={onReserve}
-                className="w-full py-3 bg-green-500 text-slate-900 font-bold rounded-xl shadow-lg"
-              >
-                Reserveren
-              </button>
-            </div>
-
           </div>
+
+          {/* RIGHT - Pricing & CTA */}
+          <div className="space-y-6">
+            <div className="bg-white border-2 border-terracotta/30 rounded-2xl p-6 shadow-xl sticky top-24">
+
+              {/* Location */}
+              <div className="flex items-center gap-2 text-gray-600 mb-4">
+                <span className="text-xl">📍</span>
+                <span className="text-lg font-medium">{property.location}</span>
+              </div>
+
+              {/* Price */}
+              <p className="text-4xl font-display font-bold text-terracotta mb-6">
+                {formatPrice(property.price)}
+              </p>
+
+              {/* Specs Grid */}
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="bg-sand-light p-4 rounded-xl text-center border border-sand-dark/30">
+                  <p className="text-xs text-gray-500 font-medium mb-1">Oppervlakte</p>
+                  <p className="text-mediterranean text-xl font-bold">{property.m2} m²</p>
+                </div>
+
+                <div className="bg-sand-light p-4 rounded-xl text-center border border-sand-dark/30">
+                  <p className="text-xs text-gray-500 font-medium mb-1">Slaapkamers</p>
+                  <p className="text-mediterranean text-xl font-bold">{property.bedrooms}</p>
+                </div>
+
+                <div className="bg-sand-light p-4 rounded-xl text-center border border-sand-dark/30">
+                  <p className="text-xs text-gray-500 font-medium mb-1">Oplevering</p>
+                  <p className="text-gray-800 text-sm font-bold">{property.deliveryDate}</p>
+                </div>
+
+                <div className="bg-sand-light p-4 rounded-xl text-center border border-sand-dark/30">
+                  <p className="text-xs text-gray-500 font-medium mb-1">ROI</p>
+                  <p className="text-olive text-xl font-bold">{property.roi}%</p>
+                </div>
+              </div>
+
+              {/* Sales Info */}
+              <div className="border-t-2 border-sand-dark pt-6">
+                <p className="text-gray-600 text-sm mb-2 flex justify-between">
+                  <span>Verkocht:</span>
+                  <span className="font-semibold">{property.soldUnits}/{property.totalUnits} units</span>
+                </p>
+
+                <div className="w-full bg-sand rounded-full h-3 mb-3 overflow-hidden">
+                  <div
+                    className="h-3 rounded-full bg-gradient-to-r from-terracotta to-terracotta-light transition-all duration-500"
+                    style={{ width: `${percentageSold}%` }}
+                  ></div>
+                </div>
+
+                <p className="text-gray-600 text-sm mb-4">
+                  Verkooptempo: <span className="font-semibold text-gray-800">{soldPerMonth.toFixed(1)}/maand</span> ({monthsElapsed} maanden)
+                </p>
+
+                {/* Urgency Badge */}
+                <div className={`
+                  px-4 py-3 rounded-xl font-bold text-center text-white shadow-lg
+                  bg-gradient-to-r ${urgencyStyles[urgency.text] || "from-olive to-olive-light"}
+                `}>
+                  {urgency.text} — {available} beschikbaar
+                </div>
+              </div>
+
+              {/* CTA Buttons */}
+              <div className="mt-6 space-y-3">
+                <button
+                  onClick={onReserve}
+                  className="w-full py-4 bg-gradient-to-r from-olive to-olive-light text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition"
+                >
+                  ✅ Reserveren
+                </button>
+
+                <button
+                  onClick={onAIMatch}
+                  className="w-full py-3 bg-gradient-to-r from-mediterranean to-mediterranean-dark text-white font-bold rounded-xl shadow-md hover:shadow-lg transition"
+                >
+                  🤖 AI Matching
+                </button>
+              </div>
+
+            </div>
+          </div>
+
         </div>
 
       </div>
-
     </div>
   );
 }
@@ -629,6 +1134,7 @@ function ReservationPage({ property, onBack, onSuccess }) {
   });
 
   const [error, setError] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
 
   async function handleSubmit() {
     if (isEmpty(form.name) || isEmpty(form.email) || isEmpty(form.phone)) {
@@ -636,6 +1142,7 @@ function ReservationPage({ property, onBack, onSuccess }) {
       return;
     }
 
+    setLoading(true);
     const reservation = {
       id: Date.now(),
       projectId: property.id,
@@ -647,83 +1154,118 @@ function ReservationPage({ property, onBack, onSuccess }) {
     };
 
     await saveToNetlify(reservation, "reservations.json");
+    setLoading(false);
     onSuccess();
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-8">
+    <div className="min-h-screen bg-gradient-to-b from-sand-light to-white py-12 px-6">
+      <div className="max-w-2xl mx-auto">
 
-      <button
-        onClick={onBack}
-        className="flex items-center gap-2 text-amber-300 hover:text-amber-400 transition mb-6"
-      >
-        ← Terug
-      </button>
+        <button
+          onClick={onBack}
+          className="flex items-center gap-2 text-terracotta hover:text-terracotta-dark transition mb-6 font-medium"
+        >
+          ← Terug
+        </button>
 
-      <h1 className="text-3xl font-bold mb-6 text-amber-300">
-        Reserveren – {property.title}
-      </h1>
-
-      <div className="bg-slate-900/60 border border-amber-500/20 p-6 rounded-xl mb-6">
-        <p className="text-white font-bold">{property.title}</p>
-        <p className="text-slate-300">📍 {property.location}</p>
-        <p className="text-amber-300 text-xl">{formatPrice(property.price)}</p>
-      </div>
-
-      {error && (
-        <div className="bg-red-600/40 border border-red-500/50 text-red-100 px-4 py-2 rounded-lg mb-4">
-          {error}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-gradient-to-br from-olive to-olive-light rounded-full mx-auto mb-4 flex items-center justify-center text-3xl">
+            ✅
+          </div>
+          <h1 className="text-4xl font-display font-bold text-gray-900 mb-2">
+            Reserveer Uw Project
+          </h1>
+          <p className="text-gray-600">Vul onderstaand formulier in en wij nemen snel contact op</p>
         </div>
-      )}
 
-      <div className="space-y-5">
-        <input
-          className="w-full px-4 py-3 bg-slate-800/50 border rounded-xl text-white"
-          placeholder="Uw naam *"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-        />
-
-        <input
-          type="email"
-          className="w-full px-4 py-3 bg-slate-800/50 border rounded-xl text-white"
-          placeholder="E-mail *"
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-        />
-
-        <input
-          className="w-full px-4 py-3 bg-slate-800/50 border rounded-xl text-white"
-          placeholder="Telefoon *"
-          value={form.phone}
-          onChange={(e) => setForm({ ...form, phone: e.target.value })}
-        />
-
-        <textarea
-          rows="4"
-          className="w-full px-4 py-3 bg-slate-800/50 border rounded-xl text-white"
-          placeholder="Bericht (optioneel)"
-          value={form.message}
-          onChange={(e) => setForm({ ...form, message: e.target.value })}
-        />
-
-        <div className="flex gap-3">
-          <button
-            onClick={onBack}
-            className="flex-1 px-6 py-4 bg-slate-700 text-white rounded-xl"
-          >
-            Annuleer
-          </button>
-
-          <button
-            onClick={handleSubmit}
-            className="flex-1 px-6 py-4 bg-amber-500 text-slate-900 rounded-xl font-bold"
-          >
-            Verstuur
-          </button>
+        {/* Property Summary */}
+        <div className="bg-white border-2 border-terracotta/30 p-6 rounded-2xl mb-6 shadow-lg">
+          <h3 className="text-xl font-display font-bold text-gray-900 mb-2">{property.title}</h3>
+          <div className="flex items-center gap-2 text-gray-600 mb-2">
+            <span>📍</span>
+            <span>{property.location}</span>
+          </div>
+          <p className="text-2xl font-display font-bold text-terracotta">{formatPrice(property.price)}</p>
         </div>
-      </div>
 
+        {error && (
+          <div className="bg-red-100 border-2 border-red-300 text-red-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-2">
+            <span>⚠️</span>
+            <span>{error}</span>
+          </div>
+        )}
+
+        <div className="bg-white border-2 border-sand-dark/30 p-8 rounded-2xl shadow-lg space-y-5">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Uw naam *</label>
+            <input
+              className="w-full px-4 py-3 bg-sand-light border-2 border-sand-dark rounded-xl text-gray-800 focus:border-terracotta focus:outline-none focus:ring-2 focus:ring-terracotta/20"
+              placeholder="Jan de Vries"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">E-mailadres *</label>
+            <input
+              type="email"
+              className="w-full px-4 py-3 bg-sand-light border-2 border-sand-dark rounded-xl text-gray-800 focus:border-terracotta focus:outline-none focus:ring-2 focus:ring-terracotta/20"
+              placeholder="jan@example.com"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Telefoonnummer *</label>
+            <input
+              type="tel"
+              className="w-full px-4 py-3 bg-sand-light border-2 border-sand-dark rounded-xl text-gray-800 focus:border-terracotta focus:outline-none focus:ring-2 focus:ring-terracotta/20"
+              placeholder="+31 6 12345678"
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Bericht (optioneel)</label>
+            <textarea
+              rows="4"
+              className="w-full px-4 py-3 bg-sand-light border-2 border-sand-dark rounded-xl text-gray-800 focus:border-terracotta focus:outline-none focus:ring-2 focus:ring-terracotta/20"
+              placeholder="Vertel ons over uw interesse en eventuele vragen..."
+              value={form.message}
+              onChange={(e) => setForm({ ...form, message: e.target.value })}
+            />
+          </div>
+
+          <div className="flex gap-4 pt-4">
+            <button
+              onClick={onBack}
+              className="flex-1 px-6 py-4 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition"
+            >
+              Annuleren
+            </button>
+
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="flex-1 px-6 py-4 bg-gradient-to-r from-olive to-olive-light text-white rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="spinner !w-5 !h-5 !border-2 !border-white !border-t-transparent"></div>
+                  Versturen...
+                </span>
+              ) : (
+                "📤 Verstuur Reservering"
+              )}
+            </button>
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 }
@@ -735,16 +1277,48 @@ function ReservationPage({ property, onBack, onSuccess }) {
 // =========================================================
 function ReservationSuccess({ onClose }) {
   return (
-    <div className="max-w-xl mx-auto p-8 text-center">
-      <h1 className="text-3xl font-bold text-amber-300 mb-4">🎉 Verzonden!</h1>
-      <p className="text-slate-300 mb-6">Wij nemen snel contact op.</p>
+    <div className="min-h-screen bg-gradient-to-b from-sand-light to-white flex items-center justify-center px-6">
+      <div className="max-w-xl mx-auto text-center">
+        
+        <div className="w-24 h-24 bg-gradient-to-br from-olive to-olive-light rounded-full mx-auto mb-6 flex items-center justify-center text-5xl animate-fadeInUp">
+          🎉
+        </div>
 
-      <button
-        onClick={onClose}
-        className="px-6 py-3 bg-amber-500 text-slate-900 rounded-xl font-bold"
-      >
-        Terug naar overzicht
-      </button>
+        <h1 className="text-4xl font-display font-bold text-gray-900 mb-4">
+          Reservering Verzonden!
+        </h1>
+        
+        <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+          Bedankt voor uw interesse! Een van onze experts neemt binnen 24 uur contact met u op om uw reservering te bevestigen en al uw vragen te beantwoorden.
+        </p>
+
+        <div className="bg-sand-light border-2 border-sand-dark/50 rounded-2xl p-6 mb-8">
+          <p className="text-gray-700 mb-2">
+            <span className="font-semibold">Volgende stappen:</span>
+          </p>
+          <ul className="text-left text-gray-600 space-y-2">
+            <li className="flex items-start gap-2">
+              <span className="text-terracotta mt-1">✓</span>
+              <span>U ontvangt een bevestigingsmail</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-terracotta mt-1">✓</span>
+              <span>Een expert neemt contact met u op</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-terracotta mt-1">✓</span>
+              <span>Wij bespreken alle details en mogelijkheden</span>
+            </li>
+          </ul>
+        </div>
+
+        <button
+          onClick={onClose}
+          className="px-8 py-4 bg-gradient-to-r from-terracotta to-terracotta-light text-white rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition"
+        >
+          🏠 Terug naar Projecten
+        </button>
+      </div>
     </div>
   );
 }
@@ -1417,6 +1991,7 @@ function App() {
               setSelectedProject(p === "new" ? null : p);
               setPage("admin-edit");
             }}
+            onRegister={() => setLoginModalOpen(true)}
           />
         );
 
@@ -1516,60 +2091,87 @@ function App() {
   // ----------------------------------------
   function Navbar() {
     return (
-      <div className="w-full bg-slate-900/80 border-b border-slate-800 backdrop-blur-xl">
+      <nav className="w-full bg-white/95 backdrop-blur-xl border-b-2 border-sand-dark shadow-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
 
-          <h1
-            className="text-xl font-bold text-amber-400 cursor-pointer"
+          {/* Logo / Brand */}
+          <div 
+            className="flex items-center gap-3 cursor-pointer group"
             onClick={() => setPage("overview")}
           >
-            Costa Capital – Vastgoed Platform
-          </h1>
+            <div className="w-10 h-10 bg-gradient-to-br from-terracotta to-mediterranean rounded-lg flex items-center justify-center text-white text-xl font-bold">
+              🏖️
+            </div>
+            <div>
+              <h1 className="text-xl font-display font-bold text-gray-900 group-hover:text-terracotta transition">
+                Costa Capital
+              </h1>
+              <p className="text-xs text-gray-600 -mt-1">Spanish Dream Homes</p>
+            </div>
+          </div>
 
-          <div className="flex items-center gap-4">
+          {/* Navigation Links & Actions */}
+          <div className="flex items-center gap-3">
 
             {user && (
               <>
                 <button
-                  onClick={() => setPage("dashboard")}
-                  className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl hover:bg-slate-700 transition"
+                  onClick={() => setPage("overview")}
+                  className="hidden md:block px-4 py-2 text-gray-700 hover:text-terracotta font-medium transition"
                 >
-                  Mijn Dashboard
+                  Projecten
+                </button>
+
+                <button
+                  onClick={() => setPage("dashboard")}
+                  className="px-4 py-2 bg-sand-light text-gray-800 rounded-xl hover:bg-sand-dark font-medium transition border border-sand-dark/30"
+                >
+                  📊 Dashboard
                 </button>
 
                 {isAdmin && (
                   <button
                     onClick={() => setPage("admin-edit")}
-                    className="px-4 py-2 bg-amber-500 text-slate-900 rounded-xl font-bold"
+                    className="px-4 py-2 bg-gradient-to-r from-mediterranean to-mediterranean-dark text-white rounded-xl font-bold shadow-md hover:shadow-lg transform hover:scale-105"
                   >
-                    Admin
+                    ⚙️ Admin
                   </button>
                 )}
+
+                <div className="h-8 w-px bg-sand-dark"></div>
+
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 text-gray-600 hover:text-red-600 font-medium transition"
+                  title="Uitloggen"
+                >
+                  🚪 Uitloggen
+                </button>
               </>
             )}
 
             {!user && (
-              <button
-                onClick={() => setLoginModalOpen(true)}
-                className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl hover:bg-slate-700"
-              >
-                Inloggen
-              </button>
-            )}
+              <>
+                <button
+                  onClick={() => setPage("overview")}
+                  className="hidden md:block px-4 py-2 text-gray-700 hover:text-terracotta font-medium transition"
+                >
+                  Projecten
+                </button>
 
-            {user && (
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-500"
-              >
-                Uitloggen
-              </button>
+                <button
+                  onClick={() => setLoginModalOpen(true)}
+                  className="px-5 py-2 bg-gradient-to-r from-terracotta to-terracotta-light text-white rounded-xl font-bold shadow-md hover:shadow-lg transform hover:scale-105"
+                >
+                  🔑 Inloggen
+                </button>
+              </>
             )}
 
           </div>
 
         </div>
-      </div>
+      </nav>
     );
   }
 
