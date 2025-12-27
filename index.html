@@ -25,32 +25,52 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    /* Spanish/Mediterranean Color Palette */
+    /* Professional Real Estate Color Palette */
     :root {
-      --terracotta: #D2691E;
-      --terracotta-light: #E8956B;
-      --mediterranean-blue: #0077BE;
-      --mediterranean-blue-dark: #005A8D;
-      --sand: #F5E6D3;
-      --sand-dark: #E8D4BA;
-      --olive: #6B8E23;
-      --olive-light: #8FB339;
-      --warm-white: #FFF8F0;
-      --cream: #FFF5E6;
+      /* Primary - Professional Neutrals */
+      --primary-dark: #1A1A1A;
+      --primary-gray: #2C3E50;
+      --text-dark: #2D3436;
+      --text-gray: #636E72;
+      
+      /* Accent - Sophisticated Warmth */
+      --accent-copper: #B87333;
+      --accent-copper-light: #CD8651;
+      --accent-gold: #D4AF37;
+      
+      /* Neutrals */
+      --bg-white: #FFFFFF;
+      --bg-light: #F8F9FA;
+      --bg-cream: #FAF7F5;
+      --border-light: #E8E8E8;
+      --border-medium: #DFE6E9;
+      
+      /* Dark Backgrounds */
+      --bg-dark-green: #2C5F4D;
+      --bg-charcoal: #36454F;
+      --bg-dark-overlay: rgba(44, 95, 77, 0.85);
+      
+      /* Semantic */
+      --success: #27AE60;
+      --warning: #F39C12;
+      --danger: #E74C3C;
     }
 
     body {
-      background: linear-gradient(135deg, var(--warm-white) 0%, var(--cream) 100%);
+      background: var(--bg-white);
       font-family: 'Inter', sans-serif;
-      color: #2C1810;
+      color: var(--text-dark);
+      line-height: 1.6;
     }
 
     h1, h2, h3, .heading-font {
       font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      line-height: 1.2;
     }
 
     .modal-backdrop {
-      background: rgba(45, 35, 25, 0.85);
+      background: rgba(26, 26, 26, 0.85);
       backdrop-filter: blur(10px);
     }
 
@@ -59,35 +79,23 @@
       transition: all 0.2s ease-in-out;
     }
 
-    /* Hero Gradient Background */
-    .hero-gradient {
-      background: linear-gradient(165deg, 
-        var(--mediterranean-blue) 0%, 
-        var(--mediterranean-blue-dark) 50%,
-        var(--terracotta) 100%);
+    /* Hero Image Background */
+    .hero-image {
+      background: linear-gradient(to bottom, rgba(44, 95, 77, 0.4) 0%, rgba(44, 95, 77, 0.7) 100%),
+                  url('https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=1920&q=80');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
     }
 
-    /* Mediterranean Pattern Overlay */
-    .mediterranean-pattern {
-      background-image: 
-        radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(210, 105, 30, 0.05) 0%, transparent 50%);
-    }
-
-    /* Card Hover Effects */
+    /* Card Hover Effects - Subtle */
     .project-card {
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
     .project-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 20px 40px rgba(210, 105, 30, 0.15);
-    }
-
-    /* Spanish Tile Pattern */
-    .tile-pattern {
-      background-image: 
-        repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(210, 105, 30, 0.03) 10px, rgba(210, 105, 30, 0.03) 20px);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
     }
 
     /* Smooth Scroll */
@@ -101,16 +109,16 @@
     }
 
     ::-webkit-scrollbar-track {
-      background: var(--sand);
+      background: var(--bg-light);
     }
 
     ::-webkit-scrollbar-thumb {
-      background: var(--terracotta);
+      background: var(--accent-copper);
       border-radius: 5px;
     }
 
     ::-webkit-scrollbar-thumb:hover {
-      background: var(--mediterranean-blue);
+      background: var(--accent-copper-light);
     }
 
     /* Animation Classes */
@@ -129,24 +137,24 @@
       animation: fadeInUp 0.6s ease-out forwards;
     }
 
-    /* Pulse Animation for Urgent Badges */
-    @keyframes pulse-glow {
+    /* Subtle Pulse for Badges */
+    @keyframes pulse-subtle {
       0%, 100% {
-        box-shadow: 0 0 0 0 rgba(210, 105, 30, 0.4);
+        opacity: 1;
       }
       50% {
-        box-shadow: 0 0 0 10px rgba(210, 105, 30, 0);
+        opacity: 0.85;
       }
     }
 
-    .pulse-glow {
-      animation: pulse-glow 2s infinite;
+    .pulse-subtle {
+      animation: pulse-subtle 3s infinite;
     }
 
     /* Loading State */
     .spinner {
-      border: 3px solid var(--sand);
-      border-top: 3px solid var(--terracotta);
+      border: 3px solid var(--bg-light);
+      border-top: 3px solid var(--accent-copper);
       border-radius: 50%;
       width: 40px;
       height: 40px;
@@ -156,6 +164,19 @@
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
+    }
+
+    /* Image Zoom on Hover */
+    .image-zoom-hover {
+      overflow: hidden;
+    }
+
+    .image-zoom-hover img {
+      transition: transform 0.6s ease;
+    }
+
+    .image-zoom-hover:hover img {
+      transform: scale(1.05);
     }
   </style>
 
@@ -492,103 +513,122 @@ function ProjectCard({ p, onSelect, isAdmin, onEdit }) {
   const { available, percentageSold } = calculateAvailability(p);
   const urgency = getUrgencyLevel(available);
 
-  // Spanish-themed urgency colors
+  // Professional urgency colors
   const urgencyStyles = {
-    "Laatste kans": "bg-gradient-to-r from-red-600 to-orange-500 pulse-glow",
-    "Bijna uitverkocht": "bg-gradient-to-r from-orange-500 to-terracotta pulse-glow",
-    "Populair": "bg-gradient-to-r from-terracotta to-terracotta-light",
-    "Beschikbaar": "bg-gradient-to-r from-olive to-olive-light"
+    "Laatste kans": "bg-danger text-white pulse-subtle",
+    "Bijna uitverkocht": "bg-warning text-white",
+    "Populair": "bg-accent-copper text-white",
+    "Beschikbaar": "bg-success text-white"
   };
 
   return (
-    <div className="project-card bg-white rounded-2xl overflow-hidden shadow-lg border border-sand-dark/30 hover:border-terracotta/50">
+    <div className="project-card bg-white rounded-xl overflow-hidden shadow-md border border-border-light hover:shadow-xl">
 
       {/* IMAGE */}
-      <div className="relative overflow-hidden group">
+      <div className="relative image-zoom-hover">
         <img
           src={p.images?.[0] || "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=800&q=80"}
-          className="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
+          className="w-full h-64 object-cover"
           alt={p.title}
         />
 
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        {/* Subtle Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
 
         {/* URGENCY BADGE */}
-        <div className="absolute top-4 left-4">
-          <div className={`
-            px-4 py-2 rounded-full text-xs font-bold text-white shadow-lg
-            ${urgencyStyles[urgency.text] || "bg-olive"}
-          `}>
+        <div className="absolute top-4 right-4">
+          <div className={`px-3 py-1 rounded-md text-xs font-semibold shadow-lg ${urgencyStyles[urgency.text] || "bg-success text-white"}`}
+            style={{backgroundColor: urgency.text === "Laatste kans" ? "var(--danger)" : urgency.text === "Bijna uitverkocht" ? "var(--warning)" : urgency.text === "Populair" ? "var(--accent-copper)" : "var(--success)"}}
+          >
             {urgency.text}
           </div>
         </div>
 
         {/* ADMIN BUTTONS */}
         {isAdmin && (
-          <div className="absolute top-4 right-4 flex gap-2">
+          <div className="absolute top-4 left-4">
             <button
               onClick={(e) => { e.stopPropagation(); onEdit(p); }}
-              className="px-3 py-1 bg-mediterranean text-white rounded-full text-xs font-bold shadow-lg hover:bg-mediterranean-dark"
+              className="px-3 py-1 text-white rounded-md text-xs font-semibold shadow-lg hover:bg-white hover:text-primary-dark transition"
+              style={{backgroundColor: "var(--primary-gray)"}}
             >
-              ✏️ Bewerken
+              Bewerken
             </button>
           </div>
         )}
 
         {/* Location Badge */}
         <div className="absolute bottom-4 left-4">
-          <div className="bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold text-gray-800 flex items-center gap-1">
-            📍 {p.location}
+          <div className="bg-white/95 backdrop-blur-sm px-3 py-1 rounded-md text-xs font-medium flex items-center gap-1.5"
+            style={{color: "var(--text-dark)"}}
+          >
+            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+            </svg>
+            {p.location}
           </div>
         </div>
       </div>
 
       {/* CONTENT */}
       <div className="p-6">
-        <h3 className="text-xl font-display font-bold text-gray-900 mb-2 line-clamp-2">
+        <h3 className="text-xl font-display font-bold mb-2 line-clamp-2"
+          style={{color: "var(--text-dark)"}}
+        >
           {p.title}
         </h3>
 
-        <p className="text-3xl font-display font-bold text-terracotta mb-4">
+        <p className="text-3xl font-display font-bold mb-4"
+          style={{color: "var(--accent-copper)"}}
+        >
           {formatPrice(p.price)}
         </p>
 
-        {/* STATS */}
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="bg-sand-light rounded-xl p-3 text-center">
-            <p className="text-gray-500 text-xs font-medium mb-1">ROI</p>
-            <p className="text-mediterranean font-bold text-lg">{p.roi}%</p>
-          </div>
-          <div className="bg-sand-light rounded-xl p-3 text-center">
-            <p className="text-gray-500 text-xs font-medium mb-1">Units</p>
-            <p className="text-gray-800 font-bold text-lg">{p.totalUnits}</p>
-          </div>
-          <div className="bg-sand-light rounded-xl p-3 text-center">
-            <p className="text-gray-500 text-xs font-medium mb-1">Vrij</p>
-            <p className="text-olive font-bold text-lg">{available}</p>
-          </div>
+        {/* Property Details - Inline */}
+        <div className="flex items-center gap-2 mb-4 text-sm flex-wrap"
+          style={{color: "var(--text-gray)"}}
+        >
+          <span className="font-medium">{p.roi}% ROI</span>
+          <span>|</span>
+          <span>{p.totalUnits} Units</span>
+          <span>|</span>
+          <span className="font-medium"
+            style={{color: "var(--success)"}}
+          >{available} Beschikbaar</span>
         </div>
 
         {/* PROGRESS BAR */}
-        <div className="mb-4">
-          <div className="flex justify-between text-xs text-gray-600 mb-1">
-            <span>Verkocht</span>
+        <div className="mb-5">
+          <div className="flex justify-between text-xs mb-2"
+            style={{color: "var(--text-gray)"}}
+          >
+            <span className="font-medium">Verkocht</span>
             <span className="font-semibold">{percentageSold}%</span>
           </div>
-          <div className="w-full bg-sand rounded-full h-2 overflow-hidden">
+          <div className="w-full rounded-full h-1.5 overflow-hidden"
+            style={{backgroundColor: "var(--bg-light)"}}
+          >
             <div
-              className="h-2 rounded-full bg-gradient-to-r from-terracotta to-terracotta-light transition-all duration-500"
-              style={{ width: `${percentageSold}%` }}
+              className="h-1.5 rounded-full transition-all duration-500"
+              style={{ 
+                width: `${percentageSold}%`,
+                backgroundColor: "var(--accent-copper)"
+              }}
             />
           </div>
         </div>
 
         <button
           onClick={() => onSelect(p)}
-          className="w-full bg-gradient-to-r from-terracotta to-terracotta-light text-white py-3 rounded-xl font-bold shadow-md hover:shadow-lg hover:from-terracotta-dark hover:to-terracotta transform hover:scale-105"
+          className="w-full py-3 rounded-lg font-semibold transition-all hover:shadow-md"
+          style={{
+            backgroundColor: "var(--accent-copper)",
+            color: "white"
+          }}
+          onMouseEnter={(e) => e.target.style.backgroundColor = "var(--accent-copper-light)"}
+          onMouseLeave={(e) => e.target.style.backgroundColor = "var(--accent-copper)"}
         >
-          Bekijk Project →
+          Bekijk Details →
         </button>
 
       </div>
@@ -603,67 +643,83 @@ function ProjectCard({ p, onSelect, isAdmin, onEdit }) {
 // =========================================================
 function HeroSection({ onRegister, onBrowse }) {
   return (
-    <div className="hero-gradient mediterranean-pattern py-20 px-6 text-white">
-      <div className="max-w-6xl mx-auto text-center">
+    <div className="hero-image relative min-h-screen flex items-center justify-center text-white">
+      <div className="max-w-5xl mx-auto text-center px-6 py-20">
         
         {/* Main Headline */}
-        <div className="animate-fadeInUp mb-6">
-          <h1 className="text-5xl md:text-7xl font-display font-bold mb-4 leading-tight">
-            Uw Droomhuis<br />
-            <span className="text-sand-light">aan de Spaanse Kust</span>
+        <div className="animate-fadeInUp mb-8">
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold mb-6 leading-tight">
+            Premium Spaanse<br />
+            Off-Plan Projecten
           </h1>
-          <p className="text-xl md:text-2xl text-sand-light/90 max-w-3xl mx-auto leading-relaxed">
-            Ontdek premium off-plan vastgoedprojecten in Spanje. 
-            Aantrekkelijke rendementen, professioneel beheer, zorgeloos investeren.
+          <p className="text-xl md:text-2xl text-white/95 max-w-3xl mx-auto leading-relaxed font-light">
+            Exclusieve vastgoedontwikkelingen aan de Costa's.<br className="hidden md:block" />
+            Professioneel beheer. Aantrekkelijke rendementen.
           </p>
         </div>
 
-        {/* Key Benefits */}
-        <div className="grid md:grid-cols-3 gap-6 my-12 max-w-4xl mx-auto">
-          {[
-            { icon: "🏖️", title: "Costa Locaties", desc: "Exclusieve projecten aan de mooiste kusten" },
-            { icon: "💰", title: "Hoog Rendement", desc: "Aantrekkelijke ROI en waardestijging" },
-            { icon: "🤝", title: "Persoonlijk Advies", desc: "Expert begeleiding van A tot Z" }
-          ].map((benefit, i) => (
-            <div key={i} className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition">
-              <div className="text-4xl mb-3">{benefit.icon}</div>
-              <h3 className="font-display font-bold text-lg mb-2">{benefit.title}</h3>
-              <p className="text-sm text-sand-light/80">{benefit.desc}</p>
-            </div>
-          ))}
-        </div>
-
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-10">
-          <button
-            onClick={onRegister}
-            className="px-8 py-4 bg-white text-mediterranean font-bold rounded-xl shadow-2xl hover:shadow-3xl transform hover:scale-105 text-lg"
-          >
-            🎯 Gratis Registreren
-          </button>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12">
           <button
             onClick={onBrowse}
-            className="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-xl hover:bg-white hover:text-mediterranean transition text-lg"
+            className="px-10 py-4 bg-white font-semibold rounded-lg shadow-2xl hover:shadow-3xl transform hover:scale-105 text-lg transition-all"
+            style={{color: "var(--accent-copper)"}}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = "var(--accent-copper)";
+              e.target.style.color = "white";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = "white";
+              e.target.style.color = "var(--accent-copper)";
+            }}
           >
-            🏘️ Projecten Bekijken
+            Bekijk Projecten
+          </button>
+          <button
+            onClick={onRegister}
+            className="px-10 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white transition-all text-lg"
+            style={{borderColor: "white"}}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = "white";
+              e.target.style.color = "var(--primary-dark)";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = "transparent";
+              e.target.style.color = "white";
+            }}
+          >
+            Contact
           </button>
         </div>
 
         {/* Trust Indicators */}
-        <div className="mt-12 flex flex-wrap justify-center items-center gap-8 text-sand-light/70 text-sm">
+        <div className="mt-16 flex flex-wrap justify-center items-center gap-8 text-white/80 text-sm md:text-base">
           <div className="flex items-center gap-2">
-            <span className="text-2xl">✓</span>
-            <span>100+ Tevreden Klanten</span>
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            <span className="font-medium">Exclusieve Locaties</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-2xl">✓</span>
-            <span>Exclusieve Projecten</span>
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            <span className="font-medium">Professioneel Beheer</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-2xl">✓</span>
-            <span>Zorgeloos Proces</span>
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            <span className="font-medium">Hoge ROI</span>
           </div>
         </div>
+      </div>
+
+      {/* Scroll Indicator */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+        </svg>
       </div>
     </div>
   );
@@ -675,45 +731,68 @@ function HeroSection({ onRegister, onBrowse }) {
 function WhyInvestSection() {
   const reasons = [
     {
-      icon: "☀️",
       title: "Perfect Klimaat",
-      desc: "300+ dagen zon per jaar, het hele jaar door genieten van de Spaanse levensstijl."
+      desc: "300+ dagen zon per jaar, het hele jaar door genieten van de Spaanse levensstijl en hoge verhuurpotentie."
     },
     {
-      icon: "📈",
       title: "Sterke Markt",
-      desc: "Spaanse vastgoedmarkt groeit gestaag, ideaal voor lange termijn investeringen."
+      desc: "Spaanse vastgoedmarkt groeit gestaag met consistente waardestijging, ideaal voor lange termijn investeringen."
     },
     {
-      icon: "🏠",
       title: "Off-Plan Voordeel",
-      desc: "Vroege instap betekent lagere prijzen en maximale waardestijging."
+      desc: "Vroege instap betekent lagere prijzen, flexibele betalingsplannen en maximale waardestijging bij oplevering."
     },
     {
-      icon: "🌍",
       title: "Internationale Vraag",
-      desc: "Hoge vraag van internationale kopers garandeert goede verhuurmogelijkheden."
+      desc: "Hoge vraag van internationale kopers en huurders garandeert uitstekende verhuurmogelijkheden en liquiditeit."
     }
   ];
 
   return (
-    <div className="py-20 px-6 bg-white tile-pattern">
+    <div className="py-24 px-6"
+      style={{backgroundColor: "var(--bg-cream)"}}
+    >
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-display font-bold text-gray-900 mb-4">
-            Waarom Investeren in Spaans Off-Plan?
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-display font-bold mb-4"
+            style={{color: "var(--text-dark)"}}
+          >
+            Waarom Spaans Off-Plan Vastgoed?
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Ontdek de voordelen van investeren in nieuwbouwprojecten aan de Spaanse Costa's
+          <p className="text-xl max-w-2xl mx-auto"
+            style={{color: "var(--text-gray)"}}
+          >
+            Vier sterke redenen om te investeren in Spaanse nieuwbouwprojecten
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
           {reasons.map((reason, i) => (
-            <div key={i} className="bg-sand-light rounded-2xl p-8 border-2 border-sand-dark/30 hover:border-terracotta/50 hover:shadow-lg transition">
-              <div className="text-5xl mb-4">{reason.icon}</div>
-              <h3 className="text-2xl font-display font-bold text-gray-900 mb-3">{reason.title}</h3>
-              <p className="text-gray-700 leading-relaxed">{reason.desc}</p>
+            <div key={i} className="bg-white rounded-lg p-8 border hover:shadow-lg transition-shadow"
+              style={{borderColor: "var(--border-light)"}}
+            >
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center font-bold text-xl"
+                  style={{
+                    backgroundColor: "var(--accent-copper)",
+                    color: "white"
+                  }}
+                >
+                  {i + 1}
+                </div>
+                <div>
+                  <h3 className="text-xl font-display font-bold mb-2"
+                    style={{color: "var(--text-dark)"}}
+                  >
+                    {reason.title}
+                  </h3>
+                  <p className="leading-relaxed"
+                    style={{color: "var(--text-gray)"}}
+                  >
+                    {reason.desc}
+                  </p>
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -727,20 +806,22 @@ function WhyInvestSection() {
 // =========================================================
 function HowItWorksSection() {
   const steps = [
-    { number: "1", title: "Ontdek", desc: "Browse door onze exclusieve projecten en vind uw ideale investering", icon: "🔍" },
-    { number: "2", title: "Persoonlijk Advies", desc: "Onze experts begeleiden u bij het maken van de juiste keuze", icon: "💼" },
-    { number: "3", title: "Reserveer", desc: "Veilig en eenvoudig uw off-plan project reserveren", icon: "📋" },
-    { number: "4", title: "Geniet", desc: "Wij regelen alles, u geniet van uw Spaanse droomhuis", icon: "🎉" }
+    { number: "1", title: "Ontdek", desc: "Browse door onze exclusieve projecten en vind uw ideale investering" },
+    { number: "2", title: "Advies", desc: "Onze experts begeleiden u bij het maken van de juiste keuze" },
+    { number: "3", title: "Reserveer", desc: "Veilig en eenvoudig uw off-plan project reserveren" },
+    { number: "4", title: "Profiteer", desc: "Wij regelen alles, u geniet van waardestijging en rendement" }
   ];
 
   return (
-    <div className="py-20 px-6 bg-gradient-to-br from-mediterranean/5 to-terracotta/5">
+    <div className="py-24 px-6"
+      style={{backgroundColor: "var(--bg-dark-green)"}}
+    >
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-display font-bold text-gray-900 mb-4">
-            Zo Werkt Het
+          <h2 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">
+            Hoe Werkt Het?
           </h2>
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-white/80">
             In 4 eenvoudige stappen naar uw Spaanse vastgoed
           </p>
         </div>
@@ -749,15 +830,20 @@ function HowItWorksSection() {
           {steps.map((step, i) => (
             <div key={i} className="text-center">
               <div className="relative mb-6">
-                <div className="w-20 h-20 mx-auto bg-gradient-to-br from-terracotta to-mediterranean rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg">
-                  {step.icon}
-                </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-olive text-white rounded-full flex items-center justify-center font-bold text-sm">
+                <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-2xl font-bold shadow-lg"
+                  style={{
+                    backgroundColor: "var(--accent-copper)",
+                    color: "white"
+                  }}
+                >
                   {step.number}
                 </div>
+                {i < steps.length - 1 && (
+                  <div className="hidden md:block absolute top-8 left-[calc(50%+2rem)] w-[calc(100%-2rem)] h-0.5 bg-white/20"></div>
+                )}
               </div>
-              <h3 className="text-xl font-display font-bold text-gray-900 mb-3">{step.title}</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">{step.desc}</p>
+              <h3 className="text-xl font-display font-bold text-white mb-3">{step.title}</h3>
+              <p className="text-white/70 text-sm leading-relaxed">{step.desc}</p>
             </div>
           ))}
         </div>
@@ -793,15 +879,21 @@ function OverviewPage({ projects, onSelect, isAdmin, onEdit, onRegister }) {
       )}
 
       {/* Projects Section */}
-      <div id="projects-section" className="py-16 px-6 bg-gradient-to-b from-white to-sand-light/30">
+      <div id="projects-section" className="py-24 px-6"
+        style={{backgroundColor: "var(--bg-white)"}}
+      >
         <div className="max-w-7xl mx-auto">
 
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4">
             <div>
-              <h2 className="text-4xl md:text-5xl font-display font-bold text-gray-900 mb-2">
+              <h2 className="text-4xl md:text-5xl font-display font-bold mb-2"
+                style={{color: "var(--text-dark)"}}
+              >
                 {isAdmin ? "Projectbeheer" : "Beschikbare Projecten"}
               </h2>
-              <p className="text-gray-600 text-lg">
+              <p className="text-lg"
+                style={{color: "var(--text-gray)"}}
+              >
                 {isAdmin ? "Beheer alle vastgoedprojecten" : "Ontdek onze exclusieve off-plan ontwikkelingen"}
               </p>
             </div>
@@ -809,17 +901,22 @@ function OverviewPage({ projects, onSelect, isAdmin, onEdit, onRegister }) {
             {isAdmin && (
               <button
                 onClick={() => onEdit("new")}
-                className="px-6 py-3 bg-gradient-to-r from-mediterranean to-mediterranean-dark text-white rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105"
+                className="px-6 py-3 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all"
+                style={{backgroundColor: "var(--primary-gray)"}}
+                onMouseEnter={(e) => e.target.style.backgroundColor = "var(--primary-dark)"}
+                onMouseLeave={(e) => e.target.style.backgroundColor = "var(--primary-gray)"}
               >
-                ➕ Nieuw Project
+                + Nieuw Project
               </button>
             )}
           </div>
 
           {projects.length === 0 ? (
             <div className="text-center py-20">
-              <div className="text-6xl mb-4">🏗️</div>
-              <p className="text-gray-600 text-lg">Nog geen projecten beschikbaar</p>
+              <svg className="w-24 h-24 mx-auto mb-4" style={{color: "var(--text-gray)"}} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              <p className="text-lg" style={{color: "var(--text-gray)"}}>Nog geen projecten beschikbaar</p>
             </div>
           ) : (
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -840,19 +937,30 @@ function OverviewPage({ projects, onSelect, isAdmin, onEdit, onRegister }) {
 
       {/* Contact CTA Section */}
       {!isAdmin && projects.length > 0 && (
-        <div className="py-20 px-6 bg-gradient-to-r from-terracotta to-mediterranean text-white">
+        <div className="py-20 px-6"
+          style={{backgroundColor: "var(--bg-dark-green)"}}
+        >
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-4xl font-display font-bold mb-4">
+            <h2 className="text-4xl font-display font-bold text-white mb-4">
               Vragen over Off-Plan Investeren?
             </h2>
-            <p className="text-xl text-sand-light/90 mb-8">
+            <p className="text-xl text-white/80 mb-8">
               Onze experts staan voor u klaar met persoonlijk advies
             </p>
             <button
               onClick={onRegister}
-              className="px-8 py-4 bg-white text-terracotta font-bold rounded-xl shadow-2xl hover:shadow-3xl transform hover:scale-105 text-lg"
+              className="px-10 py-4 bg-white rounded-lg font-semibold shadow-2xl hover:shadow-3xl transition-all text-lg"
+              style={{color: "var(--accent-copper)"}}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = "var(--accent-copper)";
+                e.target.style.color = "white";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = "white";
+                e.target.style.color = "var(--accent-copper)";
+              }}
             >
-              📞 Neem Contact Op
+              Neem Contact Op →
             </button>
           </div>
         </div>
@@ -2091,7 +2199,9 @@ function App() {
   // ----------------------------------------
   function Navbar() {
     return (
-      <nav className="w-full bg-white/95 backdrop-blur-xl border-b-2 border-sand-dark shadow-md sticky top-0 z-40">
+      <nav className="w-full backdrop-blur-sm shadow-sm sticky top-0 z-40"
+        style={{backgroundColor: "var(--bg-dark-green)"}}
+      >
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
 
           {/* Logo / Brand */}
@@ -2099,53 +2209,66 @@ function App() {
             className="flex items-center gap-3 cursor-pointer group"
             onClick={() => setPage("overview")}
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-terracotta to-mediterranean rounded-lg flex items-center justify-center text-white text-xl font-bold">
-              🏖️
-            </div>
-            <div>
-              <h1 className="text-xl font-display font-bold text-gray-900 group-hover:text-terracotta transition">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-lg"
+                style={{
+                  backgroundColor: "var(--accent-copper)",
+                  color: "white"
+                }}
+              >
+                C
+              </div>
+              <h1 className="text-xl font-display font-bold text-white">
                 Costa Capital
               </h1>
-              <p className="text-xs text-gray-600 -mt-1">Spanish Dream Homes</p>
             </div>
           </div>
 
           {/* Navigation Links & Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
 
             {user && (
               <>
                 <button
                   onClick={() => setPage("overview")}
-                  className="hidden md:block px-4 py-2 text-gray-700 hover:text-terracotta font-medium transition"
+                  className="hidden md:block px-4 py-2 text-white/90 hover:text-white font-medium transition"
                 >
                   Projecten
                 </button>
 
                 <button
                   onClick={() => setPage("dashboard")}
-                  className="px-4 py-2 bg-sand-light text-gray-800 rounded-xl hover:bg-sand-dark font-medium transition border border-sand-dark/30"
+                  className="px-4 py-2 rounded-lg font-medium transition"
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    color: "white"
+                  }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = "rgba(255, 255, 255, 0.2)"}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = "rgba(255, 255, 255, 0.1)"}
                 >
-                  📊 Dashboard
+                  Dashboard
                 </button>
 
                 {isAdmin && (
                   <button
                     onClick={() => setPage("admin-edit")}
-                    className="px-4 py-2 bg-gradient-to-r from-mediterranean to-mediterranean-dark text-white rounded-xl font-bold shadow-md hover:shadow-lg transform hover:scale-105"
+                    className="px-4 py-2 text-white rounded-lg font-semibold shadow-md hover:shadow-lg transition"
+                    style={{backgroundColor: "var(--accent-copper)"}}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = "var(--accent-copper-light)"}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = "var(--accent-copper)"}
                   >
-                    ⚙️ Admin
+                    Admin
                   </button>
                 )}
 
-                <div className="h-8 w-px bg-sand-dark"></div>
+                <div className="h-6 w-px bg-white/20"></div>
 
                 <button
                   onClick={handleLogout}
-                  className="px-4 py-2 text-gray-600 hover:text-red-600 font-medium transition"
+                  className="px-4 py-2 text-white/80 hover:text-white font-medium transition"
                   title="Uitloggen"
                 >
-                  🚪 Uitloggen
+                  Uitloggen
                 </button>
               </>
             )}
@@ -2154,16 +2277,19 @@ function App() {
               <>
                 <button
                   onClick={() => setPage("overview")}
-                  className="hidden md:block px-4 py-2 text-gray-700 hover:text-terracotta font-medium transition"
+                  className="hidden md:block px-4 py-2 text-white/90 hover:text-white font-medium transition"
                 >
                   Projecten
                 </button>
 
                 <button
                   onClick={() => setLoginModalOpen(true)}
-                  className="px-5 py-2 bg-gradient-to-r from-terracotta to-terracotta-light text-white rounded-xl font-bold shadow-md hover:shadow-lg transform hover:scale-105"
+                  className="px-6 py-2 text-white rounded-lg font-semibold shadow-md hover:shadow-lg transition"
+                  style={{backgroundColor: "var(--accent-copper)"}}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = "var(--accent-copper-light)"}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = "var(--accent-copper)"}
                 >
-                  🔑 Inloggen
+                  Inloggen
                 </button>
               </>
             )}

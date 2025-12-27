@@ -112,6 +112,5 @@
 [dev]
   command = "echo 'Running dev server'"
   port = 8888
-  targetPort = 8888
   publish = "."
   functions = "netlify/functions"
