@@ -1,9 +1,117 @@
+# ========================================
+# NETLIFY BUILD CONFIGURATION
+# ========================================
 [build]
+  # Root directory for static files
   publish = "."
+  
+  # Serverless functions directory
   functions = "netlify/functions"
+  
+  # Build command (not needed for static site)
+  command = "echo 'No build step required'"
 
-# SPA fallback (belangrijk)
+# ========================================
+# ENVIRONMENT VARIABLES (Set in Netlify UI)
+# ========================================
+# Required environment variables:
+# - JWT_SECRET: Secret key for JWT token signing (generate with: openssl rand -base64 32)
+# - DEEPSEEK_API_KEY: API key for DeepSeek AI integration
+# - NODE_VERSION: 18 (or higher)
+
+# ========================================
+# SECURITY HEADERS
+# ========================================
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Content Security Policy
+    Content-Security-Policy = """
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com;
+      style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com;
+      img-src 'self' data: https: blob:;
+      connect-src 'self' https://api.deepseek.com;
+      frame-ancestors 'none';
+    """
+    
+    # Prevent clickjacking
+    X-Frame-Options = "DENY"
+    
+    # Prevent MIME type sniffing
+    X-Content-Type-Options = "nosniff"
+    
+    # Enable XSS protection
+    X-XSS-Protection = "1; mode=block"
+    
+    # Referrer policy
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+    # Permissions policy
+    Permissions-Policy = """
+      geolocation=(),
+      midi=(),
+      camera=(),
+      usb=(),
+      magnetometer=(),
+      accelerometer=(),
+      vr=(),
+      speaker=(),
+      payment=()
+    """
+    
+    # Strict Transport Security (HTTPS only)
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+
+# Cache control for static assets
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# ========================================
+# REDIRECTS & REWRITES
+# ========================================
+
+# API endpoints - ensure they're handled by functions
+[[redirects]]
+  from = "/.netlify/functions/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# SPA fallback - must be last
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+# ========================================
+# FUNCTION CONFIGURATION
+# ========================================
+[functions]
+  # Use Node.js 18 or higher
+  node_bundler = "esbuild"
+  
+  # Include all dependencies
+  included_files = ["data/**"]
+
+# ========================================
+# DEV SERVER CONFIGURATION
+# ========================================
+[dev]
+  command = "echo 'Running dev server'"
+  port = 8888
+  targetPort = 8888
+  publish = "."
+  functions = "netlify/functions"

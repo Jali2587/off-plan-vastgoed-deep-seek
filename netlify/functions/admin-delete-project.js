@@ -1,26 +1,85 @@
 // netlify/functions/admin-delete-project.js
 
-import jwt from "jsonwebtoken";
-import { loadJSON, saveJSON } from "./lib/helpers.js";
+import { loadJSON, saveJSON, extractAuthToken, verifyToken } from "./lib/helpers.js";
 
 export const handler = async (event) => {
   try {
+    // -------------------------------
+    // AUTH CHECK
+    // -------------------------------
     const auth = event.headers.authorization;
-    if (!auth) return { statusCode: 401, body: "Missing authorization" };
-
-    const token = auth.replace("Bearer ", "");
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    if (decoded.role !== "admin") {
-      return { statusCode: 403, body: "Forbidden: admin only" };
+    
+    if (!auth) {
+      return { 
+        statusCode: 401, 
+        body: JSON.stringify({ error: "Missing authorization" }) 
+      };
     }
 
-    const { projectId } = JSON.parse(event.body);
+    const token = extractAuthToken(auth);
+    
+    let decoded;
+    try {
+      decoded = verifyToken(token);
+    } catch (err) {
+      return { 
+        statusCode: 401, 
+        body: JSON.stringify({ error: "Invalid token" }) 
+      };
+    }
 
-    let projects = loadJSON("projects.json");
+    if (decoded.role !== "admin") {
+      return { 
+        statusCode: 403, 
+        body: JSON.stringify({ error: "Forbidden: admin only" }) 
+      };
+    }
+
+    // -------------------------------
+    // PARSE REQUEST BODY
+    // -------------------------------
+    if (!event.body) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Request body ontbreekt." })
+      };
+    }
+
+    let body;
+    try {
+      body = JSON.parse(event.body);
+    } catch (err) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Ongeldige JSON in request body." })
+      };
+    }
+
+    const { projectId } = body;
+
+    if (!projectId) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "projectId ontbreekt." })
+      };
+    }
+
+    // -------------------------------
+    // DELETE PROJECT
+    // -------------------------------
+    let projects = await loadJSON("projects.json");
+    const initialLength = projects.length;
+    
     projects = projects.filter((p) => p.id !== projectId);
 
-    saveJSON("projects.json", projects);
+    if (projects.length === initialLength) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ error: "Project niet gevonden." })
+      };
+    }
+
+    await saveJSON("projects.json", projects);
 
     return {
       statusCode: 200,
@@ -32,6 +91,10 @@ export const handler = async (event) => {
     };
 
   } catch (err) {
-    return { statusCode: 500, body: err.message };
+    console.error("Error in admin-delete-project:", err);
+    return { 
+      statusCode: 500, 
+      body: JSON.stringify({ error: "Internal server error", details: err.message }) 
+    };
   }
 };

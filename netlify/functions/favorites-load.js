@@ -1,11 +1,9 @@
 // netlify/functions/favorites-load.js
 
-import jwt from "jsonwebtoken";
-import { loadJSON } from "./lib/helpers.js";
+import { loadJSON, extractAuthToken, verifyToken } from "./lib/helpers.js";
 
 export const handler = async (event) => {
   try {
-
     // -------------------------------
     // AUTHENTICATIE CONTROLEREN
     // -------------------------------
@@ -18,11 +16,11 @@ export const handler = async (event) => {
       };
     }
 
-    const token = authHeader.replace("Bearer ", "").trim();
+    const token = extractAuthToken(authHeader);
 
     let decoded;
     try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
+      decoded = verifyToken(token);
     } catch (err) {
       return {
         statusCode: 401,
@@ -32,11 +30,10 @@ export const handler = async (event) => {
 
     const userEmail = decoded.email;
 
-
     // -------------------------------
     // FAVORIETEN LADEN
     // -------------------------------
-    const favorites = loadJSON("favorites.json");
+    const favorites = await loadJSON("favorites.json");
 
     const entry = favorites.find((f) => f.email === userEmail);
 
@@ -50,7 +47,6 @@ export const handler = async (event) => {
       };
     }
 
-
     // -------------------------------
     // SUCCES → FAVORIETEN TERUGSTUREN
     // -------------------------------
@@ -58,16 +54,17 @@ export const handler = async (event) => {
       statusCode: 200,
       body: JSON.stringify({
         success: true,
-        projectIds: entry.projectIds
+        projectIds: entry.projectIds || []
       })
     };
 
   } catch (err) {
+    console.error("Error in favorites-load:", err);
     return {
       statusCode: 500,
       body: JSON.stringify({
-        error: err.message,
-        details: "favorites-load.js error"
+        error: "Internal server error",
+        details: err.message
       })
     };
   }

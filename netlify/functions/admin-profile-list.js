@@ -1,22 +1,44 @@
 // netlify/functions/admin-profile-list.js
 
-import jwt from "jsonwebtoken";
-import { loadJSON } from "./lib/helpers.js";
+import { loadJSON, extractAuthToken, verifyToken } from "./lib/helpers.js";
 
 export const handler = async (event) => {
   try {
+    // -------------------------------
     // AUTH CHECK
+    // -------------------------------
     const auth = event.headers.authorization;
-    if (!auth) return { statusCode: 401, body: "Missing authorization" };
-
-    const token = auth.replace("Bearer ", "");
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    if (decoded.role !== "admin") {
-      return { statusCode: 403, body: "Forbidden: admin only" };
+    
+    if (!auth) {
+      return { 
+        statusCode: 401, 
+        body: JSON.stringify({ error: "Missing authorization" }) 
+      };
     }
 
-    const profiles = loadJSON("profiles.json");
+    const token = extractAuthToken(auth);
+    
+    let decoded;
+    try {
+      decoded = verifyToken(token);
+    } catch (err) {
+      return { 
+        statusCode: 401, 
+        body: JSON.stringify({ error: "Invalid token" }) 
+      };
+    }
+
+    if (decoded.role !== "admin") {
+      return { 
+        statusCode: 403, 
+        body: JSON.stringify({ error: "Forbidden: admin only" }) 
+      };
+    }
+
+    // -------------------------------
+    // LOAD PROFILES
+    // -------------------------------
+    const profiles = await loadJSON("profiles.json");
 
     return {
       statusCode: 200,
@@ -24,6 +46,10 @@ export const handler = async (event) => {
     };
 
   } catch (err) {
-    return { statusCode: 500, body: err.message };
+    console.error("Error in admin-profile-list:", err);
+    return { 
+      statusCode: 500, 
+      body: JSON.stringify({ error: "Internal server error", details: err.message }) 
+    };
   }
 };

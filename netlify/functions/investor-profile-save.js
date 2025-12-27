@@ -1,7 +1,6 @@
 // netlify/functions/investor-profile-save.js
 
-import jwt from "jsonwebtoken";
-import { loadJSON, saveJSON } from "./lib/helpers.js";
+import { loadJSON, saveJSON, extractAuthToken, verifyToken } from "./lib/helpers.js";
 
 export const handler = async (event) => {
   try {
@@ -17,11 +16,11 @@ export const handler = async (event) => {
       };
     }
 
-    const token = authHeader.replace("Bearer ", "").trim();
+    const token = extractAuthToken(authHeader);
 
     let decoded;
     try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
+      decoded = verifyToken(token);
     } catch (err) {
       return {
         statusCode: 401,
@@ -34,6 +33,23 @@ export const handler = async (event) => {
     // -------------------------------
     // BODY PARSEN
     // -------------------------------
+    if (!event.body) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Request body ontbreekt." })
+      };
+    }
+
+    let body;
+    try {
+      body = JSON.parse(event.body);
+    } catch (err) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Ongeldige JSON in request body." })
+      };
+    }
+
     const {
       strategy,
       ticketMin,
@@ -42,7 +58,7 @@ export const handler = async (event) => {
       roiTarget,
       riskProfile,
       notes
-    } = JSON.parse(event.body);
+    } = body;
 
     // -------------------------------
     // VALIDATIE
@@ -56,16 +72,41 @@ export const handler = async (event) => {
       };
     }
 
+    // Validate numeric fields
+    if (ticketMin !== undefined && (typeof ticketMin !== "number" || ticketMin < 0)) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "ticketMin moet een positief getal zijn." })
+      };
+    }
+
+    if (ticketMax !== undefined && (typeof ticketMax !== "number" || ticketMax < 0)) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "ticketMax moet een positief getal zijn." })
+      };
+    }
+
+    if (ticketMin !== undefined && ticketMax !== undefined && ticketMin > ticketMax) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "ticketMin kan niet groter zijn dan ticketMax." })
+      };
+    }
+
     // -------------------------------
     // PROFIEL JSON LADEN
     // -------------------------------
-    const profiles = loadJSON("profiles.json");
+    const profiles = await loadJSON("profiles.json");
 
     // Bestaat profiel al?
     let existing = profiles.find((p) => p.email === userEmail);
 
     if (!existing) {
-      existing = { email: userEmail };
+      existing = { 
+        email: userEmail,
+        createdAt: new Date().toISOString()
+      };
       profiles.push(existing);
     }
 
@@ -84,7 +125,7 @@ export const handler = async (event) => {
     // -------------------------------
     // OPSLAAN
     // -------------------------------
-    saveJSON("profiles.json", profiles);
+    await saveJSON("profiles.json", profiles);
 
     return {
       statusCode: 200,
@@ -96,11 +137,12 @@ export const handler = async (event) => {
     };
 
   } catch (err) {
+    console.error("Error in investor-profile-save:", err);
     return {
       statusCode: 500,
       body: JSON.stringify({
-        error: err.message,
-        details: "investor-profile-save.js error"
+        error: "Internal server error",
+        details: err.message
       })
     };
   }

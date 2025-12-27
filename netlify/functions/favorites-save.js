@@ -1,7 +1,6 @@
 // netlify/functions/favorites-save.js
 
-import jwt from "jsonwebtoken";
-import { loadJSON, saveJSON } from "./lib/helpers.js";
+import { loadJSON, saveJSON, extractAuthToken, verifyToken } from "./lib/helpers.js";
 
 export const handler = async (event) => {
   try {
@@ -17,11 +16,11 @@ export const handler = async (event) => {
       };
     }
 
-    const token = authHeader.replace("Bearer ", "").trim();
+    const token = extractAuthToken(authHeader);
 
     let decoded;
     try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
+      decoded = verifyToken(token);
     } catch (err) {
       return {
         statusCode: 401,
@@ -34,19 +33,36 @@ export const handler = async (event) => {
     // -------------------------------
     // REQUEST BODY PARSEN
     // -------------------------------
-    const { projectId } = JSON.parse(event.body);
-
-    if (!projectId) {
+    if (!event.body) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "projectId ontbreekt." })
+        body: JSON.stringify({ error: "Request body ontbreekt." })
+      };
+    }
+
+    let body;
+    try {
+      body = JSON.parse(event.body);
+    } catch (err) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Ongeldige JSON in request body." })
+      };
+    }
+
+    const { projectId } = body;
+
+    if (!projectId || typeof projectId !== "string") {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "projectId ontbreekt of is ongeldig." })
       };
     }
 
     // -------------------------------
     // FAVORIETEN JSON LADEN
     // -------------------------------
-    const favorites = loadJSON("favorites.json");
+    const favorites = await loadJSON("favorites.json");
 
     // Zoek favorieten van deze user
     let entry = favorites.find((f) => f.email === userEmail);
@@ -55,7 +71,8 @@ export const handler = async (event) => {
     if (!entry) {
       entry = {
         email: userEmail,
-        projectIds: []
+        projectIds: [],
+        createdAt: new Date().toISOString()
       };
       favorites.push(entry);
     }
@@ -65,12 +82,13 @@ export const handler = async (event) => {
     // -------------------------------
     if (!entry.projectIds.includes(projectId)) {
       entry.projectIds.push(projectId);
+      entry.updatedAt = new Date().toISOString();
     }
 
     // -------------------------------
     // OPSLAAN
     // -------------------------------
-    saveJSON("favorites.json", favorites);
+    await saveJSON("favorites.json", favorites);
 
     return {
       statusCode: 200,
@@ -82,11 +100,12 @@ export const handler = async (event) => {
     };
 
   } catch (err) {
+    console.error("Error in favorites-save:", err);
     return {
       statusCode: 500,
       body: JSON.stringify({
-        error: err.message,
-        details: "favorites-save.js error"
+        error: "Internal server error",
+        details: err.message
       })
     };
   }

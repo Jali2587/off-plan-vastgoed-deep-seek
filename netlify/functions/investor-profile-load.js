@@ -1,7 +1,6 @@
 // netlify/functions/investor-profile-load.js
 
-import jwt from "jsonwebtoken";
-import { loadJSON } from "./lib/helpers.js";
+import { loadJSON, extractAuthToken, verifyToken } from "./lib/helpers.js";
 
 export const handler = async (event) => {
   try {
@@ -19,14 +18,14 @@ export const handler = async (event) => {
       };
     }
 
-    const token = authHeader.replace("Bearer ", "").trim();
+    const token = extractAuthToken(authHeader);
 
     // -------------------------------
     // JWT VERIFIËREN
     // -------------------------------
     let decoded;
     try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
+      decoded = verifyToken(token);
     } catch (err) {
       return {
         statusCode: 401,
@@ -42,7 +41,7 @@ export const handler = async (event) => {
     // -------------------------------
     // PROFIELS LADEN
     // -------------------------------
-    const profiles = loadJSON("profiles.json");
+    const profiles = await loadJSON("profiles.json");
 
     const profile = profiles.find((p) => p.email === userEmail);
 
@@ -70,11 +69,12 @@ export const handler = async (event) => {
     };
 
   } catch (err) {
+    console.error("Error in investor-profile-load:", err);
     return {
       statusCode: 500,
       body: JSON.stringify({
-        error: err.message,
-        details: "investor-profile-load.js error"
+        error: "Internal server error",
+        details: err.message
       })
     };
   }
