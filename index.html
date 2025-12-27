@@ -33,10 +33,11 @@
       --text-dark: #2D3436;
       --text-gray: #636E72;
       
-      /* Accent - Sophisticated Warmth */
-      --accent-copper: #B87333;
-      --accent-copper-light: #CD8651;
-      --accent-gold: #D4AF37;
+      /* Accent - Sophisticated Warmth - BRIGHTER FOR VISIBILITY */
+      --accent-copper: #D2691E;
+      --accent-copper-light: #E67E22;
+      --accent-gold: #F39C12;
+      --accent-action: #E67E22; /* Bright call-to-action orange */
       
       /* Neutrals */
       --bg-white: #FFFFFF;
@@ -528,7 +529,7 @@ function ProjectCard({ p, onSelect, isAdmin, onEdit }) {
       <div className="relative image-zoom-hover">
         <img
           src={p.images?.[0] || "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=800&q=80"}
-          className="w-full h-64 object-cover"
+          className="w-full h-48 object-cover"
           alt={p.title}
         />
 
@@ -570,46 +571,46 @@ function ProjectCard({ p, onSelect, isAdmin, onEdit }) {
         </div>
       </div>
 
-      {/* CONTENT */}
-      <div className="p-6">
-        <h3 className="text-xl font-display font-bold mb-2 line-clamp-2"
+      {/* CONTENT - COMPACT SPACING */}
+      <div className="p-4">
+        <h3 className="text-lg font-display font-bold mb-2 line-clamp-2"
           style={{color: "var(--text-dark)"}}
         >
           {p.title}
         </h3>
 
-        <p className="text-3xl font-display font-bold mb-4"
+        <p className="text-2xl font-display font-bold mb-3"
           style={{color: "var(--accent-copper)"}}
         >
           {formatPrice(p.price)}
         </p>
 
         {/* Property Details - Inline */}
-        <div className="flex items-center gap-2 mb-4 text-sm flex-wrap"
+        <div className="flex items-center gap-2 mb-3 text-sm flex-wrap"
           style={{color: "var(--text-gray)"}}
         >
-          <span className="font-medium">{p.roi}% ROI</span>
-          <span>|</span>
+          <span className="font-bold" style={{color: "var(--success)", fontSize: "0.9rem"}}>{p.roi}% ROI</span>
+          <span>•</span>
           <span>{p.totalUnits} Units</span>
-          <span>|</span>
-          <span className="font-medium"
+          <span>•</span>
+          <span className="font-semibold"
             style={{color: "var(--success)"}}
           >{available} Beschikbaar</span>
         </div>
 
         {/* PROGRESS BAR */}
-        <div className="mb-5">
-          <div className="flex justify-between text-xs mb-2"
+        <div className="mb-3">
+          <div className="flex justify-between text-xs mb-1"
             style={{color: "var(--text-gray)"}}
           >
             <span className="font-medium">Verkocht</span>
             <span className="font-semibold">{percentageSold}%</span>
           </div>
-          <div className="w-full rounded-full h-1.5 overflow-hidden"
+          <div className="w-full rounded-full h-2 overflow-hidden"
             style={{backgroundColor: "var(--bg-light)"}}
           >
             <div
-              className="h-1.5 rounded-full transition-all duration-500"
+              className="h-2 rounded-full transition-all duration-500"
               style={{ 
                 width: `${percentageSold}%`,
                 backgroundColor: "var(--accent-copper)"
@@ -618,15 +619,25 @@ function ProjectCard({ p, onSelect, isAdmin, onEdit }) {
           </div>
         </div>
 
+        {/* PROMINENT ACTION BUTTON */}
         <button
           onClick={() => onSelect(p)}
-          className="w-full py-3 rounded-lg font-semibold transition-all hover:shadow-md"
+          className="w-full py-3.5 rounded-lg font-bold transition-all hover:shadow-lg text-base"
           style={{
-            backgroundColor: "var(--accent-copper)",
-            color: "white"
+            backgroundColor: "var(--accent-action)",
+            color: "white",
+            fontSize: "1rem"
           }}
-          onMouseEnter={(e) => e.target.style.backgroundColor = "var(--accent-copper-light)"}
-          onMouseLeave={(e) => e.target.style.backgroundColor = "var(--accent-copper)"}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = "var(--accent-gold)";
+            e.target.style.transform = "translateY(-2px)";
+            e.target.style.boxShadow = "0 8px 16px rgba(230, 126, 34, 0.3)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = "var(--accent-action)";
+            e.target.style.transform = "translateY(0)";
+            e.target.style.boxShadow = "none";
+          }}
         >
           Bekijk Details →
         </button>
@@ -658,34 +669,44 @@ function HeroSection({ onRegister, onBrowse }) {
           </p>
         </div>
 
-        {/* CTA Buttons */}
+        {/* CTA BUTTONS - HIGH VISIBILITY */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12">
           <button
             onClick={onBrowse}
-            className="px-10 py-4 bg-white font-semibold rounded-lg shadow-2xl hover:shadow-3xl transform hover:scale-105 text-lg transition-all"
-            style={{color: "var(--accent-copper)"}}
+            className="px-12 py-4 bg-white font-bold rounded-lg shadow-2xl hover:shadow-3xl transition-all text-lg"
+            style={{
+              color: "var(--accent-action)",
+              fontSize: "1.1rem"
+            }}
             onMouseEnter={(e) => {
-              e.target.style.backgroundColor = "var(--accent-copper)";
+              e.target.style.backgroundColor = "var(--accent-action)";
               e.target.style.color = "white";
+              e.target.style.transform = "scale(1.05)";
             }}
             onMouseLeave={(e) => {
               e.target.style.backgroundColor = "white";
-              e.target.style.color = "var(--accent-copper)";
+              e.target.style.color = "var(--accent-action)";
+              e.target.style.transform = "scale(1)";
             }}
           >
-            Bekijk Projecten
+            Bekijk Projecten →
           </button>
           <button
             onClick={onRegister}
-            className="px-10 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white transition-all text-lg"
-            style={{borderColor: "white"}}
+            className="px-12 py-4 bg-transparent border-2 border-white text-white font-bold rounded-lg hover:bg-white transition-all text-lg"
+            style={{
+              borderColor: "white",
+              fontSize: "1.1rem"
+            }}
             onMouseEnter={(e) => {
               e.target.style.backgroundColor = "white";
               e.target.style.color = "var(--primary-dark)";
+              e.target.style.transform = "scale(1.05)";
             }}
             onMouseLeave={(e) => {
               e.target.style.backgroundColor = "transparent";
               e.target.style.color = "white";
+              e.target.style.transform = "scale(1)";
             }}
           >
             Contact
@@ -726,7 +747,7 @@ function HeroSection({ onRegister, onBrowse }) {
 }
 
 // =========================================================
-// WHY INVEST SECTION
+// WHY INVEST SECTION - REDUCED PADDING
 // =========================================================
 function WhyInvestSection() {
   const reasons = [
@@ -749,44 +770,44 @@ function WhyInvestSection() {
   ];
 
   return (
-    <div className="py-24 px-6"
+    <div className="py-16 px-6"
       style={{backgroundColor: "var(--bg-cream)"}}
     >
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-display font-bold mb-4"
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-display font-bold mb-3"
             style={{color: "var(--text-dark)"}}
           >
             Waarom Spaans Off-Plan Vastgoed?
           </h2>
-          <p className="text-xl max-w-2xl mx-auto"
+          <p className="text-lg max-w-2xl mx-auto"
             style={{color: "var(--text-gray)"}}
           >
             Vier sterke redenen om te investeren in Spaanse nieuwbouwprojecten
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
+        <div className="grid md:grid-cols-2 gap-5">
           {reasons.map((reason, i) => (
-            <div key={i} className="bg-white rounded-lg p-8 border hover:shadow-lg transition-shadow"
+            <div key={i} className="bg-white rounded-lg p-6 border hover:shadow-lg transition-shadow"
               style={{borderColor: "var(--border-light)"}}
             >
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center font-bold text-xl"
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center font-bold text-lg"
                   style={{
-                    backgroundColor: "var(--accent-copper)",
+                    backgroundColor: "var(--accent-action)",
                     color: "white"
                   }}
                 >
                   {i + 1}
                 </div>
                 <div>
-                  <h3 className="text-xl font-display font-bold mb-2"
+                  <h3 className="text-lg font-display font-bold mb-2"
                     style={{color: "var(--text-dark)"}}
                   >
                     {reason.title}
                   </h3>
-                  <p className="leading-relaxed"
+                  <p className="leading-relaxed text-sm"
                     style={{color: "var(--text-gray)"}}
                   >
                     {reason.desc}
@@ -802,7 +823,7 @@ function WhyInvestSection() {
 }
 
 // =========================================================
-// HOW IT WORKS SECTION
+// HOW IT WORKS SECTION - IMPROVED CONTRAST
 // =========================================================
 function HowItWorksSection() {
   const steps = [
@@ -813,37 +834,37 @@ function HowItWorksSection() {
   ];
 
   return (
-    <div className="py-24 px-6"
+    <div className="py-20 px-6"
       style={{backgroundColor: "var(--bg-dark-green)"}}
     >
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">
             Hoe Werkt Het?
           </h2>
-          <p className="text-xl text-white/80">
+          <p className="text-xl text-white/90">
             In 4 eenvoudige stappen naar uw Spaanse vastgoed
           </p>
         </div>
 
-        <div className="grid md:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-4 gap-6">
           {steps.map((step, i) => (
             <div key={i} className="text-center">
-              <div className="relative mb-6">
+              <div className="relative mb-5">
                 <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-2xl font-bold shadow-lg"
                   style={{
-                    backgroundColor: "var(--accent-copper)",
+                    backgroundColor: "var(--accent-action)",
                     color: "white"
                   }}
                 >
                   {step.number}
                 </div>
                 {i < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-8 left-[calc(50%+2rem)] w-[calc(100%-2rem)] h-0.5 bg-white/20"></div>
+                  <div className="hidden md:block absolute top-8 left-[calc(50%+2rem)] w-[calc(100%-2rem)] h-0.5 bg-white/30"></div>
                 )}
               </div>
-              <h3 className="text-xl font-display font-bold text-white mb-3">{step.title}</h3>
-              <p className="text-white/70 text-sm leading-relaxed">{step.desc}</p>
+              <h3 className="text-lg font-display font-bold text-white mb-2">{step.title}</h3>
+              <p className="text-white/90 text-sm leading-relaxed">{step.desc}</p>
             </div>
           ))}
         </div>
@@ -878,20 +899,20 @@ function OverviewPage({ projects, onSelect, isAdmin, onEdit, onRegister }) {
         </>
       )}
 
-      {/* Projects Section */}
-      <div id="projects-section" className="py-24 px-6"
+      {/* Projects Section - REDUCED PADDING */}
+      <div id="projects-section" className="py-16 px-6"
         style={{backgroundColor: "var(--bg-white)"}}
       >
         <div className="max-w-7xl mx-auto">
 
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
-              <h2 className="text-4xl md:text-5xl font-display font-bold mb-2"
+              <h2 className="text-3xl md:text-4xl font-display font-bold mb-2"
                 style={{color: "var(--text-dark)"}}
               >
                 {isAdmin ? "Projectbeheer" : "Beschikbare Projecten"}
               </h2>
-              <p className="text-lg"
+              <p className="text-base"
                 style={{color: "var(--text-gray)"}}
               >
                 {isAdmin ? "Beheer alle vastgoedprojecten" : "Ontdek onze exclusieve off-plan ontwikkelingen"}
@@ -919,7 +940,7 @@ function OverviewPage({ projects, onSelect, isAdmin, onEdit, onRegister }) {
               <p className="text-lg" style={{color: "var(--text-gray)"}}>Nog geen projecten beschikbaar</p>
             </div>
           ) : (
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {projects.map((p) => (
                 <ProjectCard
                   key={p.id}
@@ -935,29 +956,34 @@ function OverviewPage({ projects, onSelect, isAdmin, onEdit, onRegister }) {
         </div>
       </div>
 
-      {/* Contact CTA Section */}
+      {/* Contact CTA Section - IMPROVED CONTRAST & VISIBILITY */}
       {!isAdmin && projects.length > 0 && (
-        <div className="py-20 px-6"
+        <div className="py-16 px-6"
           style={{backgroundColor: "var(--bg-dark-green)"}}
         >
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-4xl font-display font-bold text-white mb-4">
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">
               Vragen over Off-Plan Investeren?
             </h2>
-            <p className="text-xl text-white/80 mb-8">
+            <p className="text-lg text-white/95 mb-7">
               Onze experts staan voor u klaar met persoonlijk advies
             </p>
             <button
               onClick={onRegister}
-              className="px-10 py-4 bg-white rounded-lg font-semibold shadow-2xl hover:shadow-3xl transition-all text-lg"
-              style={{color: "var(--accent-copper)"}}
+              className="px-12 py-4 bg-white rounded-lg font-bold shadow-2xl hover:shadow-3xl transition-all text-lg"
+              style={{
+                color: "var(--accent-action)",
+                fontSize: "1.1rem"
+              }}
               onMouseEnter={(e) => {
-                e.target.style.backgroundColor = "var(--accent-copper)";
+                e.target.style.backgroundColor = "var(--accent-action)";
                 e.target.style.color = "white";
+                e.target.style.transform = "translateY(-2px)";
               }}
               onMouseLeave={(e) => {
                 e.target.style.backgroundColor = "white";
-                e.target.style.color = "var(--accent-copper)";
+                e.target.style.color = "var(--accent-action)";
+                e.target.style.transform = "translateY(0)";
               }}
             >
               Neem Contact Op →
@@ -1201,18 +1227,41 @@ function DetailPage({ property, onBack, onReserve, onAIMatch }) {
                 </div>
               </div>
 
-              {/* CTA Buttons */}
+              {/* CTA BUTTONS - HIGH VISIBILITY */}
               <div className="mt-6 space-y-3">
                 <button
                   onClick={onReserve}
-                  className="w-full py-4 bg-gradient-to-r from-olive to-olive-light text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition"
+                  className="w-full py-4 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all text-base"
+                  style={{
+                    backgroundColor: "var(--accent-action)",
+                    fontSize: "1.05rem"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = "var(--accent-gold)";
+                    e.target.style.transform = "translateY(-2px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = "var(--accent-action)";
+                    e.target.style.transform = "translateY(0)";
+                  }}
                 >
                   ✅ Reserveren
                 </button>
 
                 <button
                   onClick={onAIMatch}
-                  className="w-full py-3 bg-gradient-to-r from-mediterranean to-mediterranean-dark text-white font-bold rounded-xl shadow-md hover:shadow-lg transition"
+                  className="w-full py-3.5 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all"
+                  style={{
+                    backgroundColor: "#3498DB"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = "#2980B9";
+                    e.target.style.transform = "translateY(-2px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = "#3498DB";
+                    e.target.style.transform = "translateY(0)";
+                  }}
                 >
                   🤖 AI Matching
                 </button>
@@ -1359,7 +1408,23 @@ function ReservationPage({ property, onBack, onSuccess }) {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="flex-1 px-6 py-4 bg-gradient-to-r from-olive to-olive-light text-white rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-6 py-4 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                backgroundColor: loading ? "var(--accent-action)" : "var(--accent-action)",
+                fontSize: "1rem"
+              }}
+              onMouseEnter={(e) => {
+                if (!loading) {
+                  e.target.style.backgroundColor = "var(--accent-gold)";
+                  e.target.style.transform = "translateY(-2px)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!loading) {
+                  e.target.style.backgroundColor = "var(--accent-action)";
+                  e.target.style.transform = "translateY(0)";
+                }
+              }}
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -1422,7 +1487,19 @@ function ReservationSuccess({ onClose }) {
 
         <button
           onClick={onClose}
-          className="px-8 py-4 bg-gradient-to-r from-terracotta to-terracotta-light text-white rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition"
+          className="px-10 py-4 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition"
+          style={{
+            backgroundColor: "var(--accent-action)",
+            fontSize: "1.05rem"
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = "var(--accent-gold)";
+            e.target.style.transform = "scale(1.05)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = "var(--accent-action)";
+            e.target.style.transform = "scale(1)";
+          }}
         >
           🏠 Terug naar Projecten
         </button>
